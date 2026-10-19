@@ -338,6 +338,7 @@ async function main() {
         }
       } else {
         const message = await postMessage(chunks[i]);
+        if (!DRY_RUN) console.log(`  + Nachricht ${message.id}`);
         messages.push(message.id);
       }
       await sleep(DELAY_MS);

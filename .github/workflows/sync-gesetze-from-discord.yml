@@ -1,9 +1,10 @@
 name: Gesetze aus Discord
 
 on:
-  schedule:
-    # Alle 15 Minuten. GitHub kann Läufe verzögern oder bei Last aussetzen.
-    - cron: "*/15 * * * *"
+  # Pausiert: Der Bot wird später eingerichtet.
+  # Zum Aktivieren die beiden folgenden Zeilen einkommentieren.
+  # schedule:
+  #   - cron: "*/15 * * * *"
   workflow_dispatch:
     inputs:
       dry_run:

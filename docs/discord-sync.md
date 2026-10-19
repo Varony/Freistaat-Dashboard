@@ -71,7 +71,56 @@ Die ID bleibt beim Umbenennen erhalten, die Nachricht wird nur editiert.
 - `dry_run`: zeigt nur an, was passieren würde
 - `force`: schreibt alle Abschnitte neu, auch unveränderte
 
-## Grenzen
+## Dauerbetrieb
+
+Ein Webhook ist ein **passiver Endpunkt** – er „läuft" nicht und kann nicht
+abstürzen. Stabil bleiben müssen drei Dinge:
+
+1. **Der Webhook existiert** (Channel nicht gelöscht, Webhook nicht entfernt).
+2. **Das Secret ist gesetzt** (`DISCORD_WEBHOOK_URL`).
+3. **Der Workflow wird ausgelöst** (Push oder Zeitplan).
+
+### Was automatisch abgesichert ist
+
+- **Täglicher Abgleich:** Der Workflow läuft zusätzlich um 04:00 UTC. Falls ein
+  Push-Event verloren geht, holt der Lauf die Änderung nach. Unveränderte
+  Abschnitte werden übersprungen (Hash-Vergleich), es entsteht kein Spam.
+- **Gelöschte Nachrichten:** Wurde eine Nachricht manuell in Discord gelöscht,
+  erkennt der Sync das (HTTP 404) und postet sie beim nächsten Lauf neu.
+- **Rate Limits und Discord-Ausfälle:** 429 wird mit `retry_after` abgewartet,
+  5xx und Netzwerkfehler werden mit Backoff bis zu fünfmal wiederholt.
+- **Health-Check:** Vor jedem Lauf wird geprüft, ob der Webhook überhaupt
+  existiert. Ist er weg, schlägt der Lauf mit einer klaren Meldung fehl.
+- **Aufräumen:** Abschnitte, die aus der Datei entfernt wurden, werden auch in
+  Discord gelöscht; überzählige Nachrichten nach dem Kürzen eines Abschnitts
+  ebenfalls.
+
+### Fehler bemerken
+
+- GitHub benachrichtigt dich per E-Mail, wenn ein Workflow fehlschlägt
+  (Einstellungen → Notifications → Actions).
+- Optional: Lege einen zweiten Webhook in einem **anderen** Channel an und
+  speichere ihn als Secret `DISCORD_ALERT_WEBHOOK_URL`. Bei einem Fehler postet
+  der Workflow dort einen Link zum fehlgeschlagenen Lauf. Ein zweiter Channel
+  ist wichtig, weil der Haupt-Webhook ja gerade defekt sein kann.
+
+### Wenn der Webhook ersetzt werden muss
+
+1. Neuen Webhook im Channel anlegen.
+2. Secret `DISCORD_WEBHOOK_URL` aktualisieren.
+3. Workflow mit `force = true` starten.
+4. Die alten Nachrichten des gelöschten Webhooks manuell in Discord entfernen –
+   der neue Webhook kann sie nicht bearbeiten oder löschen.
+
+### Grenzen von GitHub Actions
+
+- **60 Tage Inaktivität:** In öffentlichen Repos deaktiviert GitHub Zeitplan-
+  Workflows nach 60 Tagen ohne Repository-Aktivität. Push-Auslöser sind davon
+  nicht betroffen; ein einziger Push reaktiviert den Zeitplan.
+- **Free-Kontingent:** 2.000 Minuten/Monat bei privaten Repos, öffentliche Repos
+  sind kostenlos. Ein Sync-Lauf dauert ca. 15 Sekunden.
+- **Kein garantierter Zeitpunkt:** Geplante Läufe starten mit Verzögerung
+  (Minuten bis wenige Stunden). Für diesen Anwendungsfall unkritisch.
 
 - **2000 Zeichen** pro Discord-Nachricht. Der Sync teilt automatisch bei 1900.
 - **Keine Tabellen:** Discord rendert Markdown-Tabellen nicht. Für Tabellen

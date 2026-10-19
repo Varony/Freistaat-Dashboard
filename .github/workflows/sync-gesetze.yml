@@ -7,6 +7,9 @@ on:
       - "content/Gesetze.md"
       - "scripts/sync-discord.mjs"
       - ".github/workflows/sync-gesetze.yml"
+  schedule:
+    # Täglicher Abgleich als Sicherheitsnetz, falls ein Push-Event verloren geht
+    - cron: "0 4 * * *"
   workflow_dispatch:
     inputs:
       dry_run:
@@ -28,6 +31,7 @@ concurrency:
 jobs:
   sync:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - name: Repository auschecken
         uses: actions/checkout@v4
@@ -57,3 +61,18 @@ jobs:
           git add .discord-sync/gesetze.json
           git commit -m "chore(discord): sync state [skip ci]"
           git push
+
+      - name: Fehler melden
+        if: failure()
+        env:
+          ALERT_WEBHOOK: ${{ secrets.DISCORD_ALERT_WEBHOOK_URL }}
+        run: |
+          if [ -z "$ALERT_WEBHOOK" ]; then
+            echo "Kein DISCORD_ALERT_WEBHOOK_URL gesetzt – übersprungen."
+            exit 0
+          fi
+
+          curl --fail --silent --show-error \
+            -H "Content-Type: application/json" \
+            -d "{\"content\":\"⚠️ Discord-Sync fehlgeschlagen: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}\",\"allowed_mentions\":{\"parse\":[]}}" \
+            "$ALERT_WEBHOOK"

@@ -174,17 +174,33 @@ async function saveState(state) {
 
 async function discord(method, url, body) {
   for (let attempt = 0; attempt < 5; attempt += 1) {
-    const response = await fetch(url, {
-      method,
-      headers: body ? { "Content-Type": "application/json" } : undefined,
-      body: body ? JSON.stringify(body) : undefined,
-    });
+    let response;
+
+    try {
+      response = await fetch(url, {
+        method,
+        headers: body ? { "Content-Type": "application/json" } : undefined,
+        body: body ? JSON.stringify(body) : undefined,
+      });
+    } catch (error) {
+      if (attempt === 4) throw error;
+      await sleep(1000 * 2 ** attempt);
+      continue;
+    }
 
     if (response.status === 429) {
       const data = await response.json().catch(() => ({}));
       const wait = Math.ceil((data.retry_after ?? 1) * 1000);
       console.warn(`Rate limit erreicht – warte ${wait} ms`);
       await sleep(wait);
+      continue;
+    }
+
+    if (response.status >= 500) {
+      if (attempt === 4) {
+        throw new Error(`${method} → HTTP ${response.status} (Discord nicht erreichbar)`);
+      }
+      await sleep(1000 * 2 ** attempt);
       continue;
     }
 
@@ -197,6 +213,19 @@ async function discord(method, url, body) {
   }
 
   throw new Error("Discord-Rate-Limit: zu viele Versuche");
+}
+
+async function checkWebhook() {
+  if (DRY_RUN) return;
+
+  try {
+    await discord("GET", WEBHOOK);
+  } catch (error) {
+    throw new Error(
+      "Der Discord-Webhook ist nicht erreichbar. Wurde er gelöscht, der Channel " +
+        `entfernt oder das Secret ersetzt? (${error.message})`,
+    );
+  }
 }
 
 async function postMessage(content) {
@@ -216,14 +245,23 @@ async function postMessage(content) {
 async function editMessage(messageId, content) {
   if (DRY_RUN) {
     console.log(`  [dry-run] bearbeite ${messageId}: ${content.split("\n")[0]}`);
-    return;
+    return true;
   }
-  if (messageId.startsWith("dry-")) return;
+  if (messageId.startsWith("dry-")) return true;
 
-  await discord("PATCH", `${WEBHOOK}/messages/${messageId}`, {
-    content,
-    allowed_mentions: { parse: [] },
-  });
+  try {
+    await discord("PATCH", `${WEBHOOK}/messages/${messageId}`, {
+      content,
+      allowed_mentions: { parse: [] },
+    });
+    return true;
+  } catch (error) {
+    if (error.message.includes("HTTP 404")) {
+      console.warn(`  Nachricht ${messageId} existiert nicht mehr – wird neu gepostet.`);
+      return false;
+    }
+    throw error;
+  }
 }
 
 async function deleteMessage(messageId) {
@@ -247,6 +285,8 @@ async function main() {
       "DISCORD_WEBHOOK_URL fehlt oder ist keine gültige Discord-Webhook-URL.",
     );
   }
+
+  await checkWebhook();
 
   const markdown = await readFile(FILE, "utf8");
   const sections = parseSections(markdown);
@@ -289,8 +329,13 @@ async function main() {
 
     for (let i = 0; i < chunks.length; i += 1) {
       if (existing[i]) {
-        await editMessage(existing[i], chunks[i]);
-        messages.push(existing[i]);
+        const edited = await editMessage(existing[i], chunks[i]);
+        if (edited) {
+          messages.push(existing[i]);
+        } else {
+          const message = await postMessage(chunks[i]);
+          messages.push(message.id);
+        }
       } else {
         const message = await postMessage(chunks[i]);
         messages.push(message.id);

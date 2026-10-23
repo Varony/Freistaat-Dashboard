@@ -1,16 +1,25 @@
-import { readFile } from "node:fs/promises";
+import { readdir, readFile } from "node:fs/promises";
 import path from "node:path";
 import { mockLaws } from "./mock-data";
 import type { Law } from "./types";
 
 export type LawBook = {
   laws: Law[];
+  origin: "discord" | "files" | "mock";
   syncedFromDiscord: boolean;
   channelID?: string;
   guildID?: string;
   channelName?: string;
   sourceUrl?: string;
 };
+
+const CONTENT_DIR = path.join(process.cwd(), "content");
+const GENERATED_FILE = "Gesetze.md";
+const MANUAL_ORDER = [
+  "Verfassung des Freistaates",
+  "Recht und Ordnung",
+  "Einstweilige Verfügungen",
+];
 
 const MESSAGE_MARKER = /<!--\s*discord:(\d+)\s*-->/;
 const PASSED_MARKER = /<!--\s*passed:([^\s]+)\s*-->/;
@@ -78,6 +87,7 @@ export function parseLawBook(markdown: string): LawBook {
 
   return {
     laws,
+    origin: channelID ? "discord" : "files",
     syncedFromDiscord: Boolean(channelID),
     channelID,
     guildID,
@@ -86,24 +96,90 @@ export function parseLawBook(markdown: string): LawBook {
   };
 }
 
+function titleFromFilename(filename: string): string {
+  return filename.replace(/\.md$/i, "").replace(/[-_]+/g, " ").trim();
+}
+
+function idFromFilename(filename: string): string {
+  return filename
+    .replace(/\.md$/i, "")
+    .toLowerCase()
+    .replace(/ä/g, "ae")
+    .replace(/ö/g, "oe")
+    .replace(/ü/g, "ue")
+    .replace(/ß/g, "ss")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
 /**
- * Liest das Gesetzblatt aus content/Gesetze.md.
- * Solange die Datei fehlt oder leer ist, werden Beispieldaten genutzt.
+ * Liest die manuell gepflegten Gesetzestexte aus content/*.md.
+ * Gesetze.md ist reserviert für den Discord-Sync.
+ */
+async function readManualLaws(): Promise<Law[]> {
+  let entries;
+  try {
+    entries = await readdir(CONTENT_DIR, { withFileTypes: true });
+  } catch {
+    return [];
+  }
+
+  const files = entries
+    .filter(
+      (entry) =>
+        entry.isFile() &&
+        entry.name.toLowerCase().endsWith(".md") &&
+        entry.name !== GENERATED_FILE,
+    )
+    .map((entry) => entry.name);
+
+  const laws = await Promise.all(
+    files.map(async (filename): Promise<Law | null> => {
+      const body = (await readFile(path.join(CONTENT_DIR, filename), "utf8")).trim();
+      if (!body) return null;
+
+      return {
+        id: idFromFilename(filename),
+        title: titleFromFilename(filename),
+        body,
+      };
+    }),
+  );
+
+  return laws
+    .filter((law): law is Law => law !== null)
+    .sort((a, b) => {
+      const indexA = MANUAL_ORDER.indexOf(a.title);
+      const indexB = MANUAL_ORDER.indexOf(b.title);
+      if (indexA !== -1 || indexB !== -1) {
+        return (indexA === -1 ? MANUAL_ORDER.length : indexA) -
+          (indexB === -1 ? MANUAL_ORDER.length : indexB);
+      }
+      return a.title.localeCompare(b.title, "de");
+    });
+}
+
+/**
+ * Bevorzugt das aus Discord erzeugte Gesetzblatt. Solange es fehlt, werden die
+ * drei manuell gepflegten Texte aus content/ verwendet.
  */
 export async function getLawBook(): Promise<LawBook> {
   try {
-    const file = await readFile(
-      path.join(process.cwd(), "content", "Gesetze.md"),
-      "utf8",
-    );
-
+    const file = await readFile(path.join(CONTENT_DIR, GENERATED_FILE), "utf8");
     const book = parseLawBook(file);
     if (book.laws.length > 0) return book;
   } catch {
-    // Datei fehlt oder ist nicht lesbar → Beispieldaten
+    // Noch kein Sync vorhanden → manuelle Texte
   }
 
-  return { laws: mockLaws, syncedFromDiscord: false };
+  const manual = await readManualLaws();
+  if (manual.length > 0) {
+    return { laws: manual, origin: "files", syncedFromDiscord: false };
+  }
+
+  return { laws: mockLaws, origin: "mock", syncedFromDiscord: false };
 }
 
 export async function getLaws(): Promise<Law[]> {

@@ -29,6 +29,15 @@ Skript erzeugt daraus `content/Gesetze.md`; jede menschliche Nachricht im
 Channel wird ein `##`-Abschnitt mit Discord-Link und Beschlussdatum. Vercel
 baut die Website nach dem Commit automatisch neu.
 
+Solange `content/Gesetze.md` noch nicht existiert, zeigt die Website die drei
+manuell gepflegten Texte aus `content/`:
+
+- `Verfassung des Freistaates.md`
+- `Recht und Ordnung.md`
+- `Einstweilige Verfügungen.md`
+
+Sobald die Datei aus dem Discord-Sync vorhanden ist, hat sie Vorrang.
+
 Benötigte Repository-Secrets:
 
 | Secret | Bedeutung |
@@ -67,7 +76,11 @@ lib/
   mock-data.ts       Beispieldaten: Wahlen, Begehren, Parteien, Gesetze
   laws.ts            parst content/Gesetze.md, Fallback auf Beispieldaten
   types.ts           Datentypen
-content/Gesetze.md   Gesetzblatt (wird aus Discord erzeugt)
+content/
+  Verfassung des Freistaates.md
+  Recht und Ordnung.md
+  Einstweilige Verfügungen.md   manuell gepflegte Gesetzestexte
+  Gesetze.md                    optional: aus Discord erzeugt, hat Vorrang
 scripts/
   sync-from-discord.mjs  Discord-Channel → Markdown
 .github/workflows/

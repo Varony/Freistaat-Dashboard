@@ -14,8 +14,14 @@ const linkClasses =
   "underline decoration-border underline-offset-4 transition-colors hover:text-text hover:decoration-accent";
 
 export default async function LawsPage() {
-  const { laws, syncedFromDiscord, channelName, sourceUrl } =
-    await getLawBook();
+  const { laws, origin, channelName, sourceUrl } = await getLawBook();
+
+  const sourceLabel =
+    origin === "discord"
+      ? "content/Gesetze.md"
+      : origin === "files"
+        ? "content/*.md"
+        : "lib/mock-data.ts";
 
   return (
     <>
@@ -27,7 +33,7 @@ export default async function LawsPage() {
           </h1>
           <p className="mt-4 max-w-2xl text-base leading-relaxed text-muted">
             Alle Beschlüsse des Freistaats an einem Ort.{" "}
-            {syncedFromDiscord ? (
+            {origin === "discord" ? (
               <>
                 Das Gesetzblatt wird automatisch aus Discord synchronisiert
                 {sourceUrl ? (
@@ -46,8 +52,10 @@ export default async function LawsPage() {
                 ) : null}
                 .
               </>
+            ) : origin === "files" ? (
+              "Die Gesetzestexte werden aus den Dateien in content/ gelesen. Der Discord-Sync ist noch nicht aktiv."
             ) : (
-              "Der Discord-Sync ist noch nicht aktiv; aktuell werden Beispieldaten angezeigt."
+              "Aktuell werden Beispieldaten angezeigt."
             )}
           </p>
         </Container>
@@ -81,10 +89,10 @@ export default async function LawsPage() {
               </div>
               <p className="mt-2 text-xs leading-relaxed text-muted">
                 <code className="rounded border border-border bg-surface-2 px-1 py-0.5">
-                  content/Gesetze.md
+                  {sourceLabel}
                 </code>
               </p>
-              {syncedFromDiscord && sourceUrl ? (
+              {origin === "discord" && sourceUrl ? (
                 <a
                   href={sourceUrl}
                   target="_blank"
@@ -96,9 +104,11 @@ export default async function LawsPage() {
                 </a>
               ) : null}
               <p className="mt-2 text-xs leading-relaxed text-faint">
-                {syncedFromDiscord
+                {origin === "discord"
                   ? "Wird automatisch aus Discord synchronisiert."
-                  : "Der Discord-Sync ist vorbereitet, aber noch nicht aktiv. Aktuell werden Beispieldaten angezeigt."}
+                  : origin === "files"
+                    ? "Manuell gepflegte Gesetzestexte."
+                    : "Beispieldaten – der Discord-Sync ist noch nicht aktiv."}
               </p>
             </Card>
           </aside>
@@ -142,8 +152,11 @@ export default async function LawsPage() {
             ))}
 
             <p className="border-t border-border pt-6 text-xs text-faint">
-              Das Gesetzblatt wird automatisch aus Discord erzeugt. Verbindlich
-              sind die Beschlüsse im Discord-Server.
+              {origin === "discord"
+                ? "Das Gesetzblatt wird automatisch aus Discord erzeugt. Verbindlich sind die Beschlüsse im Discord-Server."
+                : origin === "files"
+                  ? "Die Gesetzestexte liegen in content/ und werden manuell gepflegt."
+                  : "Das Gesetzblatt ist ein Prototyp. Verbindlich sind die Beschlüsse im Discord-Server."}
             </p>
           </div>
         </div>

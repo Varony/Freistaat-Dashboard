@@ -29,6 +29,7 @@ Repository-Secrets.
 
 ## Offen
 
+- [x] Bestehende `content/*.md` als Fallback für die Website einbinden
+- [ ] Entscheiden, ob der Discord-Sync die drei manuellen Texte ersetzen oder ergänzen soll
 - [ ] Discord-Anhänge dauerhaft speichern (CDN-Links können ablaufen)
-- [ ] Entscheiden, ob die bestehenden `content/*.md` ins Gesetzblatt einfließen
 - [ ] Alte Webhook-Dokumentation aus der Git-Historie entfernen, falls nicht mehr benötigt

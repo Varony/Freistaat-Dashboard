@@ -1,7 +1,12 @@
+<!-- Automatisch aus Discord #recht-und-ordnung generiert. Nicht direkt bearbeiten. -->
+<!-- discord-channel:1562995874852765756 -->
+<!-- discord-guild:1561751762426273892 -->
+<!-- discord-channel-url:https://discord.com/channels/1561751762426273892/1562995874852765756 -->
 
 # § 1 Keine Strafe ohne Gesetz
 
 Eine Tat kann nur bestraft werden, wenn die Strafbarkeit gesetzlich bestimmt war, bevor die Tat begangen wurde.
+
 # § 2 Ort der Tat
 
 Eine Tat ist an jedem Ort begangen:
@@ -26,7 +31,7 @@ Eine Tat ist an jedem Ort begangen:
    
 4. wer, ohne Amtsträger zu sein,
 	1. bei einer Behörde oder bei einer sonstigen Stelle, die Aufgaben der öffentlichen Verwaltung wahrnimmt, oder
-	2. bei einem Verband oder sonstigen Zusammenschluß, Betrieb oder Unternehmen, die für eine Behörde oder für eine sonstige Stelle Aufgaben der öffentlichen Verwaltung ausführen, beschäftigt oder für sie tätig und auf die gewissenhafte Erfüllung seiner Obliegenheiten auf Grund eines Gesetzes förmlich verpflichtet ist;     
+	2. bei einem Verband oder sonstigen Zusammenschluß, Betrieb oder Unternehmen, die für eine Behörde oder für eine sonstige Stelle Aufgaben der öffentlichen Verwaltung ausführen, beschäftigt oder für sie tätig und auf die gewissenhafte Erfüllung seiner Obliegenheiten auf Grund eines Gesetzes förmlich verpflichtet ist;
 
 # § 4 Sachbegriffe
 

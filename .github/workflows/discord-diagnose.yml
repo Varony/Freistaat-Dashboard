@@ -54,11 +54,24 @@ jobs:
             }
           }
 
-          const channelID = process.env.DISCORD_CHANNEL_ID;
-          if (channelID) {
-            console.log(`\n== Nachrichten in ${channelID} ==`);
+          const textChannels = [];
+
+          for (const guild of guilds) {
+            console.log(`\n== ${guild.name} (${guild.id}) ==`);
+            const channels = await api(`/guilds/${guild.id}/channels`);
+            const types = { 0: "TEXT", 5: "NEWS", 15: "FORUM", 16: "MEDIA", 4: "CATEGORY" };
+            for (const channel of channels.sort((a, b) => a.position - b.position)) {
+              if (!types[channel.type]) continue;
+              const parent = channel.parent_id ? ` (Kategorie ${channel.parent_id})` : "";
+              console.log(`${types[channel.type].padEnd(8)} #${channel.name} -> ${channel.id}${parent}`);
+              if (channel.type === 0 || channel.type === 5) textChannels.push(channel);
+            }
+          }
+
+          for (const channel of textChannels) {
+            console.log(`\n== Nachrichten in #${channel.name} (${channel.id}) ==`);
             try {
-              const messages = await api(`/channels/${channelID}/messages?limit=20`);
+              const messages = await api(`/channels/${channel.id}/messages?limit=20`);
               console.log(`Nachrichten: ${messages.length}`);
               for (const message of messages) {
                 const content = message.content ?? "";

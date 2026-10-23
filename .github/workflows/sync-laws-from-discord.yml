@@ -55,6 +55,7 @@ jobs:
         run: node scripts/sync-laws-from-discord.mjs
 
       - name: Änderung committen
+        id: commit
         if: ${{ !inputs.dry_run && steps.config.outputs.skip != 'true' }}
         run: |
           git config user.name "github-actions[bot]"
@@ -63,9 +64,23 @@ jobs:
           git add content/*.md content/discord-channels.json
           if git diff --cached --quiet; then
             echo "Keine Änderung."
+            echo "changed=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
           git commit -m "chore(gesetze): sync from Discord"
           git pull --rebase origin "${GITHUB_REF_NAME}"
           git push origin "HEAD:${GITHUB_REF_NAME}"
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+
+      - name: Vercel-Deploy auslösen
+        if: steps.commit.outputs.changed == 'true'
+        env:
+          VERCEL_DEPLOY_HOOK: ${{ secrets.VERCEL_DEPLOY_HOOK }}
+        run: |
+          if [ -z "$VERCEL_DEPLOY_HOOK" ]; then
+            echo "Kein Vercel-Deploy-Hook gesetzt – übersprungen."
+            exit 0
+          fi
+          curl -fsS -X POST "$VERCEL_DEPLOY_HOOK" > /dev/null
+          echo "Vercel-Deploy-Hook ausgelöst."

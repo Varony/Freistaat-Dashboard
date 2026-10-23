@@ -65,4 +65,5 @@ export type Law = {
   title: string;
   body: string;
   passedAt?: string;
+  sourceUrl?: string;
 };

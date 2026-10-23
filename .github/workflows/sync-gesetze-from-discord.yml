@@ -1,10 +1,9 @@
 name: Gesetze aus Discord
 
 on:
-  # Pausiert: Der Bot wird später eingerichtet.
-  # Zum Aktivieren die beiden folgenden Zeilen einkommentieren.
-  # schedule:
-  #   - cron: "*/15 * * * *"
+  # Alle 15 Minuten. GitHub kann den Lauf um einige Minuten verzögern.
+  schedule:
+    - cron: "*/15 * * * *"
   workflow_dispatch:
     inputs:
       dry_run:
@@ -30,7 +29,10 @@ jobs:
       - name: Node einrichten
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
+
+      - name: Tests
+        run: npm test
 
       - name: Channel lesen und Markdown erzeugen
         env:
@@ -39,18 +41,25 @@ jobs:
           DRY_RUN: ${{ inputs.dry_run }}
         run: node scripts/sync-from-discord.mjs
 
+      - name: Ergebnis prüfen
+        if: ${{ !inputs.dry_run }}
+        run: |
+          test -s content/Gesetze.md
+          grep -q '^## ' content/Gesetze.md
+
       - name: Änderung committen
         if: ${{ !inputs.dry_run }}
         run: |
-          if git diff --quiet -- content/Gesetze.md; then
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add content/Gesetze.md
+          if git diff --cached --quiet -- content/Gesetze.md; then
             echo "Keine Änderung."
             exit 0
           fi
 
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add content/Gesetze.md
-          git commit -m "chore(gesetze): sync from Discord [skip ci]"
+          git commit -m "chore(gesetze): sync from Discord"
 
           git pull --rebase origin "${GITHUB_REF_NAME}"
           git push origin "HEAD:${GITHUB_REF_NAME}"

@@ -25,7 +25,7 @@ export default async function HomePage() {
     (initiative) =>
       initiative.status === "collecting" || initiative.status === "qualified",
   );
-  const latestLaws = laws.slice(0, 3);
+  const latestLaws = [...laws].slice(-3).reverse();
 
   return (
     <>

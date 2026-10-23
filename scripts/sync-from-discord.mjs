@@ -1,13 +1,15 @@
 #!/usr/bin/env node
 /**
- * Liest einen Discord-Channel und schreibt den Inhalt nach content/Gesetze.md.
+ * Liest einen Discord-Channel und schreibt das Gesetzblatt nach content/Gesetze.md.
  *
  * Discord ist die Quelle: Die Datei wird bei jedem Lauf vollständig neu
- * erzeugt. Änderungen in GitHub werden dadurch überschrieben.
+ * erzeugt. Änderungen in GitHub werden dadurch überschrieben. Der Channel
+ * enthält ausschließlich Gesetze, daher wird jede menschliche Nachricht
+ * übernommen.
  *
  * Benötigt:
  *   DISCORD_BOT_TOKEN   Bot-Token (Message Content Intent aktiv!)
- *   DISCORD_CHANNEL_ID  ID des Redaktions-Channels
+ *   DISCORD_CHANNEL_ID  ID des Gesetzblatt-Channels
  *
  * Optional:
  *   SYNC_FILE, SYNC_TITLE, DRY_RUN, MAX_PAGES
@@ -86,12 +88,21 @@ async function api(pathname, attempt = 0) {
   return response.json();
 }
 
-async function fetchChannelName() {
+async function fetchChannel() {
   try {
     const channel = await api(`/channels/${CHANNEL_ID}`);
-    return channel?.name ?? CHANNEL_ID;
-  } catch {
-    return CHANNEL_ID;
+    return {
+      id: channel?.id ?? CHANNEL_ID,
+      name: channel?.name ?? CHANNEL_ID,
+      guildID: channel?.guild_id ?? null,
+      type: channel?.type ?? null,
+    };
+  } catch (error) {
+    console.warn(
+      `Channel-Info konnte nicht geladen werden (${error.message}). ` +
+        "Der Sync läuft ohne Namen und ohne Discord-Links weiter.",
+    );
+    return { id: CHANNEL_ID, name: CHANNEL_ID, guildID: null, type: null };
   }
 }
 
@@ -146,24 +157,103 @@ function messageText(message) {
   return parts.join("\n");
 }
 
-function buildMarkdown(messages, channelName) {
+function cleanTitle(value) {
+  const title = String(value ?? "")
+    .replace(/\*\*/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+  return title.slice(0, 120) || "Ohne Titel";
+}
+
+function defaultTitle(message) {
+  const date = new Date(message?.timestamp ?? "");
+  if (Number.isNaN(date.getTime())) return "Gesetz";
+  const formatted = new Intl.DateTimeFormat("de-DE", {
+    dateStyle: "medium",
+    timeZone: "Europe/Berlin",
+  }).format(date);
+  return `Gesetz vom ${formatted}`;
+}
+
+/**
+ * Verhindert, dass Überschriften im Gesetzestext vom Parser in lib/laws.ts
+ * als neuer "## "-Abschnitt interpretiert werden.
+ */
+function protectBody(value) {
+  return String(value ?? "").replace(/^(#{2,5})\s+/gm, (_, hashes) => `${hashes}# `);
+}
+
+/**
+ * Eine Nachricht wird zu einem Gesetz:
+ * - erste Zeile ist eine Markdown-Überschrift → Titel, Rest ist Text
+ * - erste Zeile ist kurz → Titel, Rest ist Text
+ * - sonst → "Gesetz vom …", kompletter Text bleibt erhalten
+ */
+function splitTitle(text, message) {
+  const normalized = String(text ?? "").replace(/\r\n/g, "\n").trim();
+  const lines = normalized.split("\n");
+  const first = lines[0]?.trim() ?? "";
+
+  const heading = first.match(/^#{1,6}\s+(.+)$/);
+  if (heading) {
+    return {
+      title: cleanTitle(heading[1]),
+      body: protectBody(lines.slice(1).join("\n").trim()),
+    };
+  }
+
+  if (first.length > 0 && first.length <= 100 && lines.length > 1) {
+    return {
+      title: cleanTitle(first),
+      body: protectBody(lines.slice(1).join("\n").trim()),
+    };
+  }
+
+  return { title: defaultTitle(message), body: protectBody(normalized) };
+}
+
+function buildMarkdown(messages, channel = {}) {
   const sorted = [...messages].sort((a, b) =>
     BigInt(a.id) < BigInt(b.id) ? -1 : BigInt(a.id) > BigInt(b.id) ? 1 : 0,
   );
 
-  const safeName = String(channelName).replace(/--+/g, "-");
-  const blocks = sorted.map(
-    (message) => `<!-- discord:${message.id} -->\n${messageText(message)}`,
-  );
+  const channelID = channel.id ?? CHANNEL_ID;
+  const guildID = channel.guildID ?? null;
+  const channelName = String(channel.name ?? CHANNEL_ID).replace(/--+/g, "-");
+  const channelURL =
+    guildID && channelID
+      ? `https://discord.com/channels/${guildID}/${channelID}`
+      : null;
+
+  const blocks = sorted.map((message) => {
+    const { title, body } = splitTitle(messageText(message), message);
+    const messageURL =
+      guildID && channelID
+        ? `https://discord.com/channels/${guildID}/${channelID}/${message.id}`
+        : null;
+
+    const lines = [`## ${title}`, "", `<!-- discord:${message.id} -->`];
+    if (message.timestamp) lines.push(`<!-- passed:${message.timestamp} -->`);
+    if (body) lines.push("", body);
+    if (messageURL) lines.push("", `[Im Discord ansehen](${messageURL})`);
+
+    return lines.join("\n");
+  });
 
   return [
     `# ${TITLE}`,
     "",
-    `<!-- Automatisch aus Discord #${safeName} generiert. Nicht direkt bearbeiten. -->`,
+    `<!-- Automatisch aus Discord #${channelName} generiert. Nicht direkt bearbeiten. -->`,
+    `<!-- discord-channel:${channelID} -->`,
+    guildID ? `<!-- discord-guild:${guildID} -->` : null,
+    `<!-- discord-channel-name:${channelName} -->`,
+    channelURL ? `<!-- discord-channel-url:${channelURL} -->` : null,
     "",
     blocks.join("\n\n---\n\n"),
     "",
-  ].join("\n");
+  ]
+    .filter((line) => line !== null)
+    .join("\n");
 }
 
 async function main() {
@@ -174,7 +264,14 @@ async function main() {
     throw new Error("DISCORD_CHANNEL_ID fehlt oder ist keine gültige Channel-ID.");
   }
 
-  const channelName = await fetchChannelName();
+  const channel = await fetchChannel();
+  if (channel.type === 15) {
+    throw new Error(
+      "Forum-Channels werden noch nicht unterstützt. Nutze einen normalen Text-Channel " +
+        "oder einen einzelnen Thread.",
+    );
+  }
+
   const messages = await fetchAllMessages();
   const relevant = messages.filter(isLawMessage);
 
@@ -186,7 +283,7 @@ async function main() {
     );
   }
 
-  const markdown = buildMarkdown(relevant, channelName);
+  const markdown = buildMarkdown(relevant, channel);
 
   let current = "";
   try {
@@ -220,4 +317,4 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   });
 }
 
-export { buildMarkdown, isLawMessage, messageText };
+export { buildMarkdown, isLawMessage, messageText, splitTitle };

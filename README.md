@@ -3,8 +3,9 @@
 Website für eine Demokratie-Simulation im Discord: Wahlen, Bürgerbegehren,
 Gesetze und Parteien an einem Ort.
 
-Aktueller Stand: **klickbarer Prototyp mit Beispieldaten**. Es gibt noch keine
-Anmeldung und keine echte Stimmabgabe. Die Daten liegen in `lib/mock-data.ts`.
+Aktueller Stand: **klickbarer Prototyp mit Beispieldaten**. Das Gesetzblatt
+wird bereits automatisch aus Discord synchronisiert. Anmeldung und echte
+Stimmabgabe fehlen noch; die übrigen Daten liegen in `lib/mock-data.ts`.
 
 ## Entwicklung
 
@@ -18,6 +19,39 @@ npm run dev
 ```bash
 npm run build   # Produktionsbuild
 npm run lint    # ESLint
+npm test        # Tests für den Discord-Sync
+```
+
+## Discord-Sync
+
+Der Gesetzblatt-Channel wird alle 15 Minuten von GitHub Actions gelesen. Das
+Skript erzeugt daraus `content/Gesetze.md`; jede menschliche Nachricht im
+Channel wird ein `##`-Abschnitt mit Discord-Link und Beschlussdatum. Vercel
+baut die Website nach dem Commit automatisch neu.
+
+Benötigte Repository-Secrets:
+
+| Secret | Bedeutung |
+| --- | --- |
+| `DISCORD_BOT_TOKEN` | Token des Discord-Bots |
+| `DISCORD_CHANNEL_ID` | ID des Gesetzblatt-Channels |
+
+Der Bot benötigt im Channel die Rechte **Channel ansehen** und
+**Nachrichtenverlauf lesen**. Im Developer Portal muss der **Message Content
+Intent** aktiviert sein.
+
+Manuell testen:
+
+1. GitHub → **Actions** → **Gesetze aus Discord** → **Run workflow**
+2. Zuerst mit `dry_run = true` starten und die Ausgabe prüfen.
+3. Danach ohne Dry-Run starten; der Workflow committet `content/Gesetze.md`.
+
+Lokal testen (Token nur in der lokalen `.env`, nicht committen):
+
+```bash
+cp .env.example .env
+# DISCORD_BOT_TOKEN und DISCORD_CHANNEL_ID eintragen
+npm run sync:discord
 ```
 
 ## Struktur
@@ -31,9 +65,15 @@ components/          Layout- und UI-Komponenten
 lib/
   site-config.ts     Name, Navigation, Discord-Link
   mock-data.ts       Beispieldaten: Wahlen, Begehren, Parteien, Gesetze
-  laws.ts            liest content/Gesetze.md, Fallback auf Beispieldaten
+  laws.ts            parst content/Gesetze.md, Fallback auf Beispieldaten
   types.ts           Datentypen
-content/Gesetze.md   Gesetzblatt (aktuell leer, später aus Discord befüllt)
+content/Gesetze.md   Gesetzblatt (wird aus Discord erzeugt)
+scripts/
+  sync-from-discord.mjs  Discord-Channel → Markdown
+.github/workflows/
+  sync-gesetze-from-discord.yml  Zeitplan und Commit
+test/
+  discord-sync.test.mjs  Tests für die Markdown-Erzeugung
 ```
 
 ## Design anpassen
@@ -52,6 +92,6 @@ werden.
 
 ## Nächste Schritte
 
-- Discord-Login und echte Stimmabgabe (Supabase)
-- Bot-Sync für das Gesetzblatt (siehe `TODO.md`)
-- Feinschliff von Farben, Schrift und Layout
+- Echte Stimmabgabe mit Discord-Login und Supabase
+- Ergebnisse und Fristen serverseitig auswerten
+- Optional: Bot postet Links zu offenen Abstimmungen und Ergebnisse

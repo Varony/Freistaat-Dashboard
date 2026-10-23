@@ -1,16 +1,21 @@
 import type { Metadata } from "next";
 import ReactMarkdown from "react-markdown";
-import { IconFile } from "@/components/icons";
+import { IconExternal, IconFile } from "@/components/icons";
 import { Badge, Card, Container } from "@/components/ui";
-import { getLaws } from "@/lib/laws";
+import { formatDate } from "@/lib/format";
+import { getLawBook } from "@/lib/laws";
 
 export const metadata: Metadata = {
   title: "Gesetze",
   description: "Das Gesetzblatt des Freistaats.",
 };
 
+const linkClasses =
+  "underline decoration-border underline-offset-4 transition-colors hover:text-text hover:decoration-accent";
+
 export default async function LawsPage() {
-  const laws = await getLaws();
+  const { laws, syncedFromDiscord, channelName, sourceUrl } =
+    await getLawBook();
 
   return (
     <>
@@ -21,8 +26,29 @@ export default async function LawsPage() {
             Gesetze
           </h1>
           <p className="mt-4 max-w-2xl text-base leading-relaxed text-muted">
-            Alle Beschlüsse des Freistaats an einem Ort. Das Gesetzblatt wird
-            später automatisch aus dem Discord-Channel erzeugt.
+            Alle Beschlüsse des Freistaats an einem Ort.{" "}
+            {syncedFromDiscord ? (
+              <>
+                Das Gesetzblatt wird automatisch aus Discord synchronisiert
+                {sourceUrl ? (
+                  <>
+                    {" "}
+                    – Quelle:{" "}
+                    <a
+                      href={sourceUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className={linkClasses}
+                    >
+                      {channelName ? `#${channelName}` : "Gesetzblatt"}
+                    </a>
+                  </>
+                ) : null}
+                .
+              </>
+            ) : (
+              "Der Discord-Sync ist noch nicht aktiv; aktuell werden Beispieldaten angezeigt."
+            )}
           </p>
         </Container>
       </section>
@@ -58,9 +84,21 @@ export default async function LawsPage() {
                   content/Gesetze.md
                 </code>
               </p>
+              {syncedFromDiscord && sourceUrl ? (
+                <a
+                  href={sourceUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="mt-3 inline-flex items-center gap-1.5 text-xs font-medium text-muted transition-colors hover:text-text"
+                >
+                  Discord-Channel öffnen
+                  <IconExternal className="h-3 w-3" />
+                </a>
+              ) : null}
               <p className="mt-2 text-xs leading-relaxed text-faint">
-                Der Discord-Sync ist vorbereitet, aber noch pausiert. Aktuell
-                werden Beispieldaten angezeigt.
+                {syncedFromDiscord
+                  ? "Wird automatisch aus Discord synchronisiert."
+                  : "Der Discord-Sync ist vorbereitet, aber noch nicht aktiv. Aktuell werden Beispieldaten angezeigt."}
               </p>
             </Card>
           </aside>
@@ -70,11 +108,33 @@ export default async function LawsPage() {
               <article key={law.id} id={law.id} className="scroll-mt-24">
                 <div className="flex items-center gap-3">
                   <span className="h-px flex-1 bg-border" />
-                  <h2 className="text-lg font-semibold tracking-tight text-text sm:text-xl">
+                  <h2 className="text-center text-lg font-semibold tracking-tight text-text sm:text-xl">
                     {law.title}
                   </h2>
                   <span className="h-px flex-1 bg-border" />
                 </div>
+
+                {law.passedAt || law.sourceUrl ? (
+                  <div className="mt-2 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-xs text-faint">
+                    {law.passedAt ? (
+                      <time dateTime={law.passedAt}>
+                        Beschlossen am {formatDate(law.passedAt)}
+                      </time>
+                    ) : null}
+                    {law.sourceUrl ? (
+                      <a
+                        href={law.sourceUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center gap-1 underline decoration-border underline-offset-4 transition-colors hover:text-text hover:decoration-accent"
+                      >
+                        Im Discord ansehen
+                        <IconExternal className="h-3 w-3" />
+                      </a>
+                    ) : null}
+                  </div>
+                ) : null}
+
                 <div className="law-prose mt-5">
                   <ReactMarkdown>{law.body}</ReactMarkdown>
                 </div>
@@ -82,8 +142,8 @@ export default async function LawsPage() {
             ))}
 
             <p className="border-t border-border pt-6 text-xs text-faint">
-              Das Gesetzblatt ist ein Prototyp. Verbindlich sind die Beschlüsse im
-              Discord-Server.
+              Das Gesetzblatt wird automatisch aus Discord erzeugt. Verbindlich
+              sind die Beschlüsse im Discord-Server.
             </p>
           </div>
         </div>

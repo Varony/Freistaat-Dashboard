@@ -2,6 +2,10 @@
 
 Stand: 23.10.2026
 
+> **Regel:** Neue Features und Workflow-Änderungen zuerst im Testserver
+> `freistaat test` testen, erst danach in `Freistaat` ausrollen.
+> Details: `AGENTS.md`.
+
 ## Erledigt
 
 ### Website & Deployment
@@ -44,6 +48,9 @@ Stand: 23.10.2026
       Build, obwohl die Deployments erfolgreich waren.
 - [ ] Optional: Vercel Deploy Hook als Secret `VERCEL_DEPLOY_HOOK` hinterlegen
       (die Workflows unterstützen ihn bereits).
+- [ ] Test/Prod-Umschaltung vereinfachen: `law-documents.json` um
+      `channels.test` / `channels.production` erweitern und einen
+      Workflow-Input für die Umgebung ergänzen.
 
 ## Offen – Website vervollständigen
 

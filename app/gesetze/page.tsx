@@ -19,7 +19,7 @@ export default async function LawsPage() {
   const sourceLabel =
     origin === "discord"
       ? "content/Gesetze.md"
-      : origin === "files"
+      : origin === "discord-files" || origin === "files"
         ? "content/*.md"
         : "lib/mock-data.ts";
 
@@ -52,8 +52,10 @@ export default async function LawsPage() {
                 ) : null}
                 .
               </>
+            ) : origin === "discord-files" ? (
+              "Die Gesetzestexte werden automatisch aus den Discord-Channels synchronisiert."
             ) : origin === "files" ? (
-              "Die Gesetzestexte werden aus den Dateien in content/ gelesen. Der Discord-Sync ist noch nicht aktiv."
+              "Die Gesetzestexte werden aus den Dateien in content/ gelesen."
             ) : (
               "Aktuell werden Beispieldaten angezeigt."
             )}
@@ -106,9 +108,11 @@ export default async function LawsPage() {
               <p className="mt-2 text-xs leading-relaxed text-faint">
                 {origin === "discord"
                   ? "Wird automatisch aus Discord synchronisiert."
-                  : origin === "files"
-                    ? "Manuell gepflegte Gesetzestexte."
-                    : "Beispieldaten – der Discord-Sync ist noch nicht aktiv."}
+                  : origin === "discord-files"
+                    ? "Aus den Discord-Channels generiert."
+                    : origin === "files"
+                      ? "Manuell gepflegte Gesetzestexte."
+                      : "Beispieldaten – der Discord-Sync ist noch nicht aktiv."}
               </p>
             </Card>
           </aside>
@@ -152,8 +156,8 @@ export default async function LawsPage() {
             ))}
 
             <p className="border-t border-border pt-6 text-xs text-faint">
-              {origin === "discord"
-                ? "Das Gesetzblatt wird automatisch aus Discord erzeugt. Verbindlich sind die Beschlüsse im Discord-Server."
+              {origin === "discord" || origin === "discord-files"
+                ? "Die Gesetzestexte werden aus Discord erzeugt. Verbindlich sind die Beschlüsse im Discord-Server."
                 : origin === "files"
                   ? "Die Gesetzestexte liegen in content/ und werden manuell gepflegt."
                   : "Das Gesetzblatt ist ein Prototyp. Verbindlich sind die Beschlüsse im Discord-Server."}

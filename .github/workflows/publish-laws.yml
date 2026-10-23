@@ -9,12 +9,12 @@ on:
         default: false
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   publish:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 10
     steps:
       - name: Repository auschecken
         uses: actions/checkout@v4
@@ -24,9 +24,34 @@ jobs:
         with:
           node-version: 22
 
-      - name: Dateien nach Discord posten
+      - name: Tests
+        run: npm test
+
+      - name: Gesetze nach Discord posten
         env:
           DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN || secrets.BOTTOKEN }}
-          DISCORD_CHANNEL_ID: ${{ secrets.DISCORD_CHANNEL_ID || vars.DISCORD_CHANNEL_ID }}
+          DISCORD_GUILD_ID: ${{ vars.DISCORD_GUILD_ID }}
+          DISCORD_INDEX_CHANNEL_ID: ${{ vars.DISCORD_CHANNEL_ID }}
           DRY_RUN: ${{ inputs.dry_run }}
         run: node scripts/publish-laws.mjs
+
+      - name: Publish-State committen
+        if: ${{ !inputs.dry_run }}
+        run: |
+          if [ ! -f content/discord-publish-state.json ]; then
+            echo "Kein Publish-State vorhanden."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add content/discord-publish-state.json
+          if git diff --cached --quiet -- content/discord-publish-state.json; then
+            echo "Keine Änderung."
+            exit 0
+          fi
+
+          git commit -m "chore(discord): update publish state"
+          git pull --rebase origin "${GITHUB_REF_NAME}"
+          git push origin "HEAD:${GITHUB_REF_NAME}"

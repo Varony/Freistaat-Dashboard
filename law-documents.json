@@ -1,0 +1,23 @@
+[
+  {
+    "title": "Verfassung des Freistaates",
+    "file": "Verfassung des Freistaates.md",
+    "channel": "verfassung-des-freistaates",
+    "kind": "headings",
+    "separator": "\n\n"
+  },
+  {
+    "title": "Recht und Ordnung",
+    "file": "Recht und Ordnung.md",
+    "channel": "recht-und-ordnung",
+    "kind": "paragraphs",
+    "separator": "\n\n"
+  },
+  {
+    "title": "Einstweilige Verfügungen",
+    "file": "Einstweilige Verfügungen.md",
+    "channel": "einstweilige-verfuegungen",
+    "kind": "numbered",
+    "separator": "\n"
+  }
+]

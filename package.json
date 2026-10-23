@@ -11,7 +11,8 @@
     "start": "next start",
     "lint": "eslint",
     "test": "node --test test/*.test.mjs",
-    "sync:discord": "node --env-file=.env scripts/sync-from-discord.mjs"
+    "sync:discord": "node --env-file=.env scripts/sync-laws-from-discord.mjs",
+    "publish:discord": "node --env-file=.env scripts/publish-laws.mjs"
   },
   "dependencies": {
     "next": "16.4.2",

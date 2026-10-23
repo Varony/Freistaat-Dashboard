@@ -1,13 +1,13 @@
 name: Gesetze aus Discord
 
 on:
-  # Alle 15 Minuten. GitHub kann den Lauf um einige Minuten verzögern.
   schedule:
+    # Alle 15 Minuten. GitHub kann den Lauf um einige Minuten verzögern.
     - cron: "*/15 * * * *"
   workflow_dispatch:
     inputs:
       dry_run:
-        description: "Nur anzeigen, Datei nicht ändern"
+        description: "Nur anzeigen, Dateien nicht ändern"
         type: boolean
         default: false
 
@@ -37,50 +37,35 @@ jobs:
       - name: Konfiguration prüfen
         id: config
         env:
-          DISCORD_CHANNEL_ID: ${{ secrets.DISCORD_CHANNEL_ID || vars.DISCORD_CHANNEL_ID }}
+          DISCORD_GUILD_ID: ${{ vars.DISCORD_GUILD_ID }}
         run: |
-          if [ -z "$DISCORD_CHANNEL_ID" ]; then
-            echo "::warning::DISCORD_CHANNEL_ID fehlt. Lege eine Repository-Variable DISCORD_CHANNEL_ID an."
+          if [ -z "$DISCORD_GUILD_ID" ]; then
+            echo "::warning::DISCORD_GUILD_ID fehlt. Lege eine Repository-Variable DISCORD_GUILD_ID an."
             echo "skip=true" >> "$GITHUB_OUTPUT"
           else
             echo "skip=false" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Channel lesen und Markdown erzeugen
+      - name: Channels lesen und Markdown erzeugen
         if: steps.config.outputs.skip != 'true'
         env:
           DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN || secrets.BOTTOKEN }}
-          DISCORD_CHANNEL_ID: ${{ secrets.DISCORD_CHANNEL_ID || vars.DISCORD_CHANNEL_ID }}
+          DISCORD_GUILD_ID: ${{ vars.DISCORD_GUILD_ID }}
           DRY_RUN: ${{ inputs.dry_run }}
-        run: node scripts/sync-from-discord.mjs
-
-      - name: Ergebnis prüfen
-        if: ${{ !inputs.dry_run && steps.config.outputs.skip != 'true' }}
-        run: |
-          if [ ! -s content/Gesetze.md ]; then
-            echo "Keine Gesetze vorhanden – überspringe Commit."
-            exit 0
-          fi
-          grep -q '^## ' content/Gesetze.md
+        run: node scripts/sync-laws-from-discord.mjs
 
       - name: Änderung committen
         if: ${{ !inputs.dry_run && steps.config.outputs.skip != 'true' }}
         run: |
-          if [ ! -f content/Gesetze.md ]; then
-            echo "Keine Datei – nichts zu committen."
-            exit 0
-          fi
-
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          git add content/Gesetze.md
-          if git diff --cached --quiet -- content/Gesetze.md; then
+          git add content/*.md content/discord-channels.json
+          if git diff --cached --quiet; then
             echo "Keine Änderung."
             exit 0
           fi
 
           git commit -m "chore(gesetze): sync from Discord"
-
           git pull --rebase origin "${GITHUB_REF_NAME}"
           git push origin "HEAD:${GITHUB_REF_NAME}"

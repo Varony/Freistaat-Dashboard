@@ -5,7 +5,7 @@ import type { Law } from "./types";
 
 export type LawBook = {
   laws: Law[];
-  origin: "discord" | "files" | "mock";
+  origin: "discord" | "discord-files" | "files" | "mock";
   syncedFromDiscord: boolean;
   channelID?: string;
   guildID?: string;
@@ -14,7 +14,7 @@ export type LawBook = {
 };
 
 const CONTENT_DIR = path.join(process.cwd(), "content");
-const GENERATED_FILE = "Gesetze.md";
+const LEGACY_FILE = "Gesetze.md";
 const MANUAL_ORDER = [
   "Verfassung des Freistaates",
   "Recht und Ordnung",
@@ -30,12 +30,13 @@ function marker(markdown: string, name: string): string | undefined {
   return match?.[1]?.trim() || undefined;
 }
 
+function stripComments(markdown: string): string {
+  return markdown.replace(/<!--[\s\S]*?-->/g, "").trim();
+}
+
 /**
- * Parst das von scripts/sync-from-discord.mjs erzeugte Gesetzblatt.
- *
- * Jedes Gesetz ist ein "## Titel"-Abschnitt. Versteckte Marker enthalten die
- * Discord-Nachrichten-ID und den Beschlusszeitpunkt; der sichtbare Link am
- * Ende führt zurück in den Channel.
+ * Parst das frühere, einzelne Gesetzblatt (content/Gesetze.md).
+ * Bleibt als Fallback erhalten, falls noch eine alte Datei vorhanden ist.
  */
 export function parseLawBook(markdown: string): LawBook {
   const channelID = marker(markdown, "discord-channel");
@@ -115,8 +116,8 @@ function idFromFilename(filename: string): string {
 }
 
 /**
- * Liest die manuell gepflegten Gesetzestexte aus content/*.md.
- * Gesetze.md ist reserviert für den Discord-Sync.
+ * Liest die drei Gesetzestexte aus content/*.md. Sie werden vom
+ * Discord-Sync erzeugt und enthalten einen Channel-Link als Kommentar.
  */
 async function readManualLaws(): Promise<Law[]> {
   let entries;
@@ -131,20 +132,24 @@ async function readManualLaws(): Promise<Law[]> {
       (entry) =>
         entry.isFile() &&
         entry.name.toLowerCase().endsWith(".md") &&
-        entry.name !== GENERATED_FILE,
+        entry.name !== LEGACY_FILE,
     )
     .map((entry) => entry.name);
 
   const laws = await Promise.all(
     files.map(async (filename): Promise<Law | null> => {
-      const body = (await readFile(path.join(CONTENT_DIR, filename), "utf8")).trim();
+      const raw = await readFile(path.join(CONTENT_DIR, filename), "utf8");
+      const sourceUrl = marker(raw, "discord-channel-url");
+      const body = stripComments(raw);
       if (!body) return null;
 
-      return {
+      const law: Law = {
         id: idFromFilename(filename),
         title: titleFromFilename(filename),
         body,
       };
+      if (sourceUrl) law.sourceUrl = sourceUrl;
+      return law;
     }),
   );
 
@@ -162,21 +167,26 @@ async function readManualLaws(): Promise<Law[]> {
 }
 
 /**
- * Bevorzugt das aus Discord erzeugte Gesetzblatt. Solange es fehlt, werden die
- * drei manuell gepflegten Texte aus content/ verwendet.
+ * Bevorzugt die drei aus Discord synchronisierten Gesetzestexte.
  */
 export async function getLawBook(): Promise<LawBook> {
+  const manual = await readManualLaws();
+  if (manual.length > 0) {
+    const fromDiscord = manual.some((law) => law.sourceUrl?.includes("discord.com"));
+    return {
+      laws: manual,
+      origin: fromDiscord ? "discord-files" : "files",
+      syncedFromDiscord: fromDiscord,
+    };
+  }
+
+  // Legacy: eine einzelne Gesetze.md
   try {
-    const file = await readFile(path.join(CONTENT_DIR, GENERATED_FILE), "utf8");
+    const file = await readFile(path.join(CONTENT_DIR, LEGACY_FILE), "utf8");
     const book = parseLawBook(file);
     if (book.laws.length > 0) return book;
   } catch {
-    // Noch kein Sync vorhanden → manuelle Texte
-  }
-
-  const manual = await readManualLaws();
-  if (manual.length > 0) {
-    return { laws: manual, origin: "files", syncedFromDiscord: false };
+    // Datei fehlt
   }
 
   return { laws: mockLaws, origin: "mock", syncedFromDiscord: false };

@@ -1,7 +1,7 @@
 <!-- Automatisch aus Discord #verfassung generiert. Nicht direkt bearbeiten. -->
-<!-- discord-channel:1562995782523691220 -->
-<!-- discord-guild:1561751762426273892 -->
-<!-- discord-channel-url:https://discord.com/channels/1561751762426273892/1562995782523691220 -->
+<!-- discord-channel:1563001672748367933 -->
+<!-- discord-guild:1551691741541830768 -->
+<!-- discord-channel-url:https://discord.com/channels/1551691741541830768/1563001672748367933 -->
 
 Im Bewußtsein seiner Verantwortung vor Gott und den Menschen,
 von dem Willen beseelt, als gleichberechtigtes Glied in einem vereinten Freistaat dem Frieden des Freistaates zu dienen, hat sich das freistaatliche Volk kraft seiner verfassungsgebenden Gewalt dieses Grundgesetz gegeben.

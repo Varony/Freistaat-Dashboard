@@ -1,7 +1,7 @@
 <!-- Automatisch aus Discord #recht-und-ordnung generiert. Nicht direkt bearbeiten. -->
-<!-- discord-channel:1562995874852765756 -->
-<!-- discord-guild:1561751762426273892 -->
-<!-- discord-channel-url:https://discord.com/channels/1561751762426273892/1562995874852765756 -->
+<!-- discord-channel:1563001741228908654 -->
+<!-- discord-guild:1551691741541830768 -->
+<!-- discord-channel-url:https://discord.com/channels/1551691741541830768/1563001741228908654 -->
 
 # § 1 Keine Strafe ohne Gesetz
 

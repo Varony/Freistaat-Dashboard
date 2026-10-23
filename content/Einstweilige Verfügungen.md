@@ -1,7 +1,7 @@
-<!-- Automatisch aus Discord #verfügungen generiert. Nicht direkt bearbeiten. -->
-<!-- discord-channel:1562995958688514129 -->
-<!-- discord-guild:1561751762426273892 -->
-<!-- discord-channel-url:https://discord.com/channels/1561751762426273892/1562995958688514129 -->
+<!-- Automatisch aus Discord #verfügen generiert. Nicht direkt bearbeiten. -->
+<!-- discord-channel:1563001767632044053 -->
+<!-- discord-guild:1551691741541830768 -->
+<!-- discord-channel-url:https://discord.com/channels/1551691741541830768/1563001767632044053 -->
 
 1. Bis das GG sowie RO fertiggestellt sind dürfen durch den Chef ausgewählte Personen über ein Komitee Verfügungen Aufstellen
 2. Verfügungen treten sofort in kraft

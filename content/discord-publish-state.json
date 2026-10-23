@@ -1,5 +1,5 @@
 {
-  "guildID": "1561751762426273892",
+  "guildID": "1551691741541830768",
   "documents": {
     "Verfassung des Freistaates": {
       "messages": [
@@ -7,7 +7,7 @@
           "index": 0,
           "heading": "Im Bewußtsein seiner Verantwortung vor Gott und den Menschen,",
           "messageIDs": [
-            "1562997637291053157"
+            "1563002532601536563"
           ],
           "hash": "f6156ea9ac294c4bfbef736037fb12ce307d9736"
         },
@@ -15,7 +15,7 @@
           "index": 1,
           "heading": "## Unzugeordnet",
           "messageIDs": [
-            "1562997642093658144"
+            "1563002539887304735"
           ],
           "hash": "ce5ccf7dca824d32e490d9e4b247636750d8c17a"
         },
@@ -23,7 +23,7 @@
           "index": 2,
           "heading": "## Die Grundgesetze",
           "messageIDs": [
-            "1562997649505001505"
+            "1563002546870550560"
           ],
           "hash": "669fbf503364b2e51f97ada701018620bb33f78a"
         },
@@ -31,7 +31,7 @@
           "index": 3,
           "heading": "### Art 1",
           "messageIDs": [
-            "1562997655037288479"
+            "1563002553661136930"
           ],
           "hash": "15496d73df39ac986730f80fdf8f7ebb899d0cda"
         },
@@ -39,7 +39,7 @@
           "index": 4,
           "heading": "### Art 2",
           "messageIDs": [
-            "1562997660330369066"
+            "1563002561273921549"
           ],
           "hash": "2a97ea0c079f7528a6966db31e07d329e6db8eb7"
         },
@@ -47,7 +47,7 @@
           "index": 5,
           "heading": "### Art 3",
           "messageIDs": [
-            "1562997665736822958"
+            "1563002569595555841"
           ],
           "hash": "67abb09085060199b5332e95f9250c12d9281f10"
         },
@@ -55,7 +55,7 @@
           "index": 6,
           "heading": "### Art 4",
           "messageIDs": [
-            "1562997671801659473"
+            "1563002576260173950"
           ],
           "hash": "1fae6ac99c51acd262e1d83bd90bdc1253521c8e"
         },
@@ -63,7 +63,7 @@
           "index": 7,
           "heading": "### Art 5",
           "messageIDs": [
-            "1562997677048995871"
+            "1563002583189032982"
           ],
           "hash": "102a5944f078f8327aa2afef29e3d622094b7451"
         },
@@ -71,7 +71,7 @@
           "index": 8,
           "heading": "### Art 6",
           "messageIDs": [
-            "1562997681519988798"
+            "1563002589988266116"
           ],
           "hash": "e2cbad9e485bb455d694672d41a85b1bd31c106f"
         },
@@ -79,7 +79,7 @@
           "index": 9,
           "heading": "### Art 7",
           "messageIDs": [
-            "1562997686796550235"
+            "1563002597084893226"
           ],
           "hash": "b1aff8913f14b9ce75a7d36e2413b6735a90cb54"
         },
@@ -87,7 +87,7 @@
           "index": 10,
           "heading": "### Art 8",
           "messageIDs": [
-            "1562997691825528895"
+            "1563002603594322023"
           ],
           "hash": "7e21b2c932c98d917569e106940ae49da60a0309"
         },
@@ -95,7 +95,7 @@
           "index": 11,
           "heading": "### Art 9",
           "messageIDs": [
-            "1562997696791580713"
+            "1563002611873882176"
           ],
           "hash": "d0eb45f200f48866384fe16097c31267db5e4876"
         },
@@ -103,7 +103,7 @@
           "index": 12,
           "heading": "### Art 10",
           "messageIDs": [
-            "1562997701929468016"
+            "1563002620472459335"
           ],
           "hash": "af02467efaaa6620ac42bdd96eca149ad466c4d0"
         },
@@ -111,7 +111,7 @@
           "index": 13,
           "heading": "### Art 11",
           "messageIDs": [
-            "1562997707033944108"
+            "1563002628890169395"
           ],
           "hash": "1e6eb84d1682557d17ca4fbf26aff0b3b004714b"
         },
@@ -119,7 +119,7 @@
           "index": 14,
           "heading": "### Art 12",
           "messageIDs": [
-            "1562997713526857789"
+            "1563002636566007821"
           ],
           "hash": "564bbb3e4e8478ec4395b2917ec927bd2c7d267d"
         },
@@ -127,7 +127,7 @@
           "index": 15,
           "heading": "### Art 13",
           "messageIDs": [
-            "1562997718891233395"
+            "1563002645365391402"
           ],
           "hash": "c701ada25724ee9b4911bc354b330019eaf570d5"
         },
@@ -135,7 +135,7 @@
           "index": 16,
           "heading": "### Art 14",
           "messageIDs": [
-            "1562997724285247629"
+            "1563002653288562711"
           ],
           "hash": "ef7fc4b1f6735707e8ac1331b8e51a83eff13fe0"
         },
@@ -143,7 +143,7 @@
           "index": 17,
           "heading": "## Staatsrechte",
           "messageIDs": [
-            "1562997729041448982"
+            "1563002661371121746"
           ],
           "hash": "118aaac9a4cfb4c48a5c3bef3f5aeb13d859c8ff"
         },
@@ -151,7 +151,7 @@
           "index": 18,
           "heading": "### Das Parlament",
           "messageIDs": [
-            "1562997733957312534"
+            "1563002669793149030"
           ],
           "hash": "0f70317c9f14a7afdbe6a2e721a301eece1c54c3"
         },
@@ -159,7 +159,7 @@
           "index": 19,
           "heading": "### Art 15",
           "messageIDs": [
-            "1562997738818510921"
+            "1563002678416506941"
           ],
           "hash": "987a8a00e824ed4310c512eb35d549d15399ed05"
         },
@@ -167,7 +167,7 @@
           "index": 20,
           "heading": "### Art 16",
           "messageIDs": [
-            "1562997743662661728"
+            "1563002687669276783"
           ],
           "hash": "878162baef7ea6846b2bc278513d8f0a37aecc32"
         },
@@ -175,7 +175,7 @@
           "index": 21,
           "heading": "### Der Ministerrat",
           "messageIDs": [
-            "1562997748935041087"
+            "1563002694929481799"
           ],
           "hash": "1ad9861f13380a783bd0eca48eaddaeb1c296d64"
         },
@@ -183,7 +183,7 @@
           "index": 22,
           "heading": "### Art 17",
           "messageIDs": [
-            "1562997754039369772"
+            "1563002703502647327"
           ],
           "hash": "71507ca6382a6fa6d92a117432f9a1871e008db4"
         },
@@ -191,7 +191,7 @@
           "index": 23,
           "heading": "### Art 18",
           "messageIDs": [
-            "1562997759798288550"
+            "1563002711723474980"
           ],
           "hash": "55d8fc8cb67e984098ee581404b0f6ad6aa298db"
         },
@@ -199,7 +199,7 @@
           "index": 24,
           "heading": "### Art 19",
           "messageIDs": [
-            "1562997765833760870"
+            "1563002727317905480"
           ],
           "hash": "cf70f4f80177804578a891bccb096d900758a178"
         },
@@ -207,7 +207,7 @@
           "index": 25,
           "heading": "### Der Chef",
           "messageIDs": [
-            "1562997770812530831"
+            "1563002733915668512"
           ],
           "hash": "9d4cea9ff460966149579dc02e82876d45a60692"
         },
@@ -215,7 +215,7 @@
           "index": 26,
           "heading": "### *\"Die Exekutive\"*",
           "messageIDs": [
-            "1562997775883313206"
+            "1563002740249075744"
           ],
           "hash": "dfe212a0a4ddbafb9f51fcde9d0902122046a8b9"
         },
@@ -223,7 +223,7 @@
           "index": 27,
           "heading": "### Art",
           "messageIDs": [
-            "1562997781256208385"
+            "1563002746649448469"
           ],
           "hash": "2f8b2905cab30d82de83ffd8624b608d32301539"
         },
@@ -231,14 +231,14 @@
           "index": 28,
           "heading": "## Bürgerrechte",
           "messageIDs": [
-            "1562997786763468842"
+            "1563002755021545593"
           ],
           "hash": "2333b31fe008d99faf28b39e96aecb5af4a74fb0"
         }
       ],
-      "channelID": "1562995782523691220",
+      "channelID": "1563001672748367933",
       "channelName": "verfassung",
-      "url": "https://discord.com/channels/1561751762426273892/1562995782523691220"
+      "url": "https://discord.com/channels/1551691741541830768/1563001672748367933"
     },
     "Recht und Ordnung": {
       "messages": [
@@ -246,7 +246,7 @@
           "index": 0,
           "heading": "# § 1 Keine Strafe ohne Gesetz",
           "messageIDs": [
-            "1562997792173981697"
+            "1563002767503654955"
           ],
           "hash": "da46d4fce9adf2785b0c6be7bc19563a78ba91a1"
         },
@@ -254,7 +254,7 @@
           "index": 1,
           "heading": "# § 2 Ort der Tat",
           "messageIDs": [
-            "1562997797228118108"
+            "1563002774512205886"
           ],
           "hash": "24d7b9a3f39be2504474722f822209acacef7138"
         },
@@ -262,7 +262,7 @@
           "index": 2,
           "heading": "# § 3 Personenbegriffe",
           "messageIDs": [
-            "1562997802316071053"
+            "1563002782892687432"
           ],
           "hash": "c2d82ff144992ba90485688af6043d38cd30042d"
         },
@@ -270,7 +270,7 @@
           "index": 3,
           "heading": "# § 4 Sachbegriffe",
           "messageIDs": [
-            "1562997807256961056"
+            "1563002789062385665"
           ],
           "hash": "1284a35dc0886969b4ed190538fcf26ddd580e12"
         },
@@ -278,7 +278,7 @@
           "index": 4,
           "heading": "## § 5 Schuld",
           "messageIDs": [
-            "1562997812151455878"
+            "1563002795609694309"
           ],
           "hash": "a81a2df3b82e56262659aab94ebadc3d0c8ee911"
         },
@@ -286,14 +286,14 @@
           "index": 5,
           "heading": "# § 2 Rechtsprechung, durch Richter und Volk",
           "messageIDs": [
-            "1562997817323167835"
+            "1563002802488483913"
           ],
           "hash": "b91c12d85169aa4652236445ff60c46e75cb3af1"
         }
       ],
-      "channelID": "1562995874852765756",
+      "channelID": "1563001741228908654",
       "channelName": "recht-und-ordnung",
-      "url": "https://discord.com/channels/1561751762426273892/1562995874852765756"
+      "url": "https://discord.com/channels/1551691741541830768/1563001741228908654"
     },
     "Einstweilige Verfügungen": {
       "messages": [
@@ -301,7 +301,7 @@
           "index": 0,
           "heading": "1. Bis das GG sowie RO fertiggestellt sind dürfen durch den Chef ausgewählte Pe…",
           "messageIDs": [
-            "1562997822754787421"
+            "1563002809128067163"
           ],
           "hash": "3d6eaa5923ede3dd3355393ad5a47a5a79ffc49e"
         },
@@ -309,7 +309,7 @@
           "index": 1,
           "heading": "2. Verfügungen treten sofort in kraft",
           "messageIDs": [
-            "1562997827670642712"
+            "1563002815486369947"
           ],
           "hash": "4fb70806766841ebe8755945ec9a02c388d3b970"
         },
@@ -317,14 +317,14 @@
           "index": 2,
           "heading": "3. sobald eine absolute Mehrheit des gesamten Volkes beschließt, dass das Geset…",
           "messageIDs": [
-            "1562997833223643147"
+            "1563002831236243609"
           ],
           "hash": "1bbdb0d407362cd8a004caebae1354f0c4fb88c5"
         }
       ],
-      "channelID": "1562995958688514129",
-      "channelName": "verfügungen",
-      "url": "https://discord.com/channels/1561751762426273892/1562995958688514129"
+      "channelID": "1563001767632044053",
+      "channelName": "verfügen",
+      "url": "https://discord.com/channels/1551691741541830768/1563001767632044053"
     }
   },
   "index": {

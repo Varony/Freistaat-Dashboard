@@ -80,6 +80,18 @@ test("isLawMessage ignoriert Bots, Webhooks und Systemnachrichten", () => {
   assert.equal(isLawMessage({ ...baseMessage, content: "   " }), false);
 });
 
+test("isLawMessage akzeptiert Bot-Nachrichten mit Markdown-Anhang", () => {
+  assert.equal(
+    isLawMessage({
+      ...baseMessage,
+      author: { bot: true },
+      content: "# Verfassung",
+      attachments: [{ filename: "Verfassung.md", url: "https://cdn.example/Verfassung.md" }],
+    }),
+    true,
+  );
+});
+
 test("buildMarkdown erzeugt die Struktur, die lib/laws.ts erwartet", () => {
   const messages = [
     {

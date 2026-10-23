@@ -136,7 +136,14 @@ async function fetchAllMessages() {
 
 function isLawMessage(message) {
   if (message.webhook_id) return false; // vom alten Webhook gepostet
-  if (message.author?.bot) return false;
+
+  // Der Bot postet die Gesetzesdateien selbst. Diese Nachrichten haben einen
+  // Markdown-Anhang und müssen daher übernommen werden.
+  const hasMarkdownAttachment = (message.attachments ?? []).some((attachment) =>
+    /\.(md|txt)$/i.test(attachment.filename ?? ""),
+  );
+  if (message.author?.bot && !hasMarkdownAttachment) return false;
+
   if (![0, 19].includes(message.type ?? 0)) return false; // 0 = normal, 19 = Antwort
 
   const hasText = typeof message.content === "string" && message.content.trim().length > 0;

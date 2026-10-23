@@ -35,6 +35,13 @@ jobs:
           const guilds = await api("/users/@me/guilds");
           console.log(`Guilds: ${guilds.length}`);
 
+          const app = await api("/oauth2/applications/@me");
+          console.log(`Bot: ${app.name} (${app.id})`);
+          console.log(
+            `Invite: https://discord.com/oauth2/authorize?client_id=${app.id}` +
+              "&permissions=66560&scope=bot%20applications.commands",
+          );
+
           for (const guild of guilds) {
             console.log(`\n== ${guild.name} (${guild.id}) ==`);
             const channels = await api(`/guilds/${guild.id}/channels`);

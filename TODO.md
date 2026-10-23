@@ -19,21 +19,25 @@ Stand: 23.10.2026
 
 - [x] Drei Gesetzes-Channels: `#verfassung`, `#recht-und-ordnung`,
       `#verfügungen`
-- [x] Ausgangstexte nach Discord veröffentlicht (29 + 6 + 3 Gesetze)
+- [x] Ein Channel pro Gesetzestext, eine Nachricht pro einzelnem Gesetz
+      (29 + 6 + 3 Nachrichten)
 - [x] Übersichts-Channel `#gestze` verlinkt die Gesetzes-Channels
 - [x] `DISCORD_GUILD_ID` als Repository-Variable gesetzt
+- [x] Publish-Workflow ist idempotent
+      (`content/discord-publish-state.json`)
 - [x] Sync schreibt die Texte zurück nach `content/*.md` und
       `content/discord-channels.json`
 - [x] `content/Gesetze.md` entfernt; die Website liest die drei Dateien direkt
 - [x] Website zeigt die synchronisierten Texte mit Discord-Links
+- [x] `README.md` an die neue Struktur angepasst
 
 ## Offen – Discord & Deployment
 
-- [ ] `README.md` an die neue Struktur anpassen
-      (kein `content/Gesetze.md` mehr, `sync-laws-from-discord.mjs`)
 - [ ] Altes Secret `WEBHOOKURL` löschen, falls nicht mehr benötigt
-- [ ] Entscheiden, ob künftige Gesetzesänderungen nur in Discord oder auch in
-      `content/*.md` gepflegt werden
+- [ ] Entscheidung: Discord ist die Quelle, `content/*.md` ist der
+      Sync-Snapshot. Künftige Gesetzesänderungen also in Discord vornehmen.
+- [ ] Alte Attachment-Nachrichten in `#gestze` löschen, falls nicht als
+      Archiv benötigt
 
 ## Offen – Website vervollständigen
 

@@ -24,51 +24,56 @@ npm test        # Tests für den Discord-Sync
 
 ## Discord-Sync
 
-Der Gesetzblatt-Channel (`#gestze`) wird alle 15 Minuten von GitHub Actions
-gelesen. Das Skript erzeugt daraus `content/Gesetze.md`; jede Nachricht mit
-Gesetzestext wird ein `##`-Abschnitt mit Discord-Link und Beschlussdatum.
-Vercel baut die Website nach dem Commit automatisch neu.
+Die Gesetze liegen in drei Discord-Channels:
 
-Die drei Ausgangstexte liegen als Markdown-Dateien in `content/`:
+- `#verfassung` – Verfassung des Freistaates
+- `#recht-und-ordnung` – Recht und Ordnung
+- `#verfügungen` – Einstweilige Verfügungen
 
-- `Verfassung des Freistaates.md`
-- `Recht und Ordnung.md`
-- `Einstweilige Verfügungen.md`
+Jedes einzelne Gesetz ist eine eigene Nachricht. Die Zuordnung Dokument →
+Channel → Datei steht in `law-documents.json`.
 
-Sie wurden einmalig über den Workflow **Gesetze nach Discord veröffentlichen**
-als Nachrichten mit Markdown-Anhang in den Channel gepostet. Der Sync lädt
-diese Anhänge herunter und übernimmt den vollständigen Text. Solange
-`content/Gesetze.md` fehlt, zeigt die Website die drei Dateien direkt.
+Ablauf:
+
+1. **Gesetze nach Discord veröffentlichen** (`publish-laws.yml`) liest die
+   drei Markdown-Dateien, teilt sie in einzelne Gesetze und legt bzw.
+   aktualisiert Channels und Nachrichten. Der Workflow ist idempotent; der
+   Fortschritt steht in `content/discord-publish-state.json`.
+2. **Gesetze aus Discord** (`sync-laws-from-discord.yml`) liest die drei
+   Channels alle 15 Minuten und schreibt `content/*.md` sowie
+   `content/discord-channels.json`.
+3. Vercel baut die Website nach jedem Commit neu.
+
+Die Website liest die drei Dateien direkt. Jedes Dokument verlinkt auf seinen
+Discord-Channel.
 
 Benötigte Repository-Konfiguration:
 
 | Name | Typ | Bedeutung |
 | --- | --- | --- |
 | `BOTTOKEN` | Secret | Token des Discord-Bots (`DISCORD_BOT_TOKEN` wird ebenfalls akzeptiert) |
-| `DISCORD_CHANNEL_ID` | Variable | ID des Gesetzblatt-Channels |
-| `WEBHOOKURL` | Secret | Wird nicht mehr benötigt und kann entfernt werden |
+| `DISCORD_GUILD_ID` | Variable | Server-ID |
+| `DISCORD_CHANNEL_ID` | Variable | Übersichts-Channel `#gestze` |
+| `WEBHOOKURL` | Secret | Wird nicht mehr benötigt |
 
-Der Bot benötigt im Channel **Channel ansehen** und **Nachrichtenverlauf
-lesen**. Für das einmalige Veröffentlichen zusätzlich **Nachrichten senden**
-und **Dateien anhängen**. Im Developer Portal muss der **Message Content
-Intent** aktiviert sein.
+Der Bot benötigt **Channel ansehen**, **Nachrichtenverlauf lesen**,
+**Nachrichten senden**, **Nachrichten verwalten** und **Channels verwalten**
+(für das Anlegen und Aktualisieren der Gesetzes-Channels). Im Developer Portal
+muss der **Message Content Intent** aktiviert sein.
 
-Manuell testen:
+Manuell:
 
-1. GitHub → **Actions** → **Gesetze aus Discord** → **Run workflow**
-2. Zuerst mit `dry_run = true` starten und die Ausgabe prüfen.
-3. Danach ohne Dry-Run starten; der Workflow committet `content/Gesetze.md`.
-
-Gesetze erneut in den Channel posten (überspringt bereits vorhandene Dateien):
-
-1. GitHub → **Actions** → **Gesetze nach Discord veröffentlichen** → **Run workflow**
-2. Optional vorher mit `dry_run = true` prüfen.
+1. GitHub → **Actions** → **Gesetze nach Discord veröffentlichen** →
+   **Run workflow** (zuerst mit `dry_run = true`).
+2. GitHub → **Actions** → **Gesetze aus Discord** → **Run workflow**
+   (optional ebenfalls mit `dry_run`).
 
 Lokal testen (Token nur in der lokalen `.env`, nicht committen):
 
 ```bash
 cp .env.example .env
-# DISCORD_BOT_TOKEN und DISCORD_CHANNEL_ID eintragen
+# DISCORD_BOT_TOKEN, DISCORD_GUILD_ID und DISCORD_INDEX_CHANNEL_ID eintragen
+npm run publish:discord
 npm run sync:discord
 ```
 
@@ -83,21 +88,25 @@ components/          Layout- und UI-Komponenten
 lib/
   site-config.ts     Name, Navigation, Discord-Link
   mock-data.ts       Beispieldaten: Wahlen, Begehren, Parteien, Gesetze
-  laws.ts            parst content/Gesetze.md, Fallback auf Beispieldaten
+  laws.ts            liest content/*.md, Fallback auf Beispieldaten
   types.ts           Datentypen
 content/
-  Verfassung des Freistaates.md
-  Recht und Ordnung.md
-  Einstweilige Verfügungen.md   Ausgangstexte / Fallback
-  Gesetze.md                    aus Discord erzeugt, hat Vorrang
+  Verfassung des Freistaates.md   aus #verfassung generiert
+  Recht und Ordnung.md            aus #recht-und-ordnung generiert
+  Einstweilige Verfügungen.md     aus #verfügungen generiert
+  discord-channels.json           Channel-IDs für die Website
+  discord-publish-state.json      Nachrichten-IDs für idempotentes Publishing
+law-documents.json   Dokument → Channel → Datei + Trennregel
 scripts/
-  sync-from-discord.mjs  Discord-Channel → Markdown
-  publish-laws.mjs       content/*.md → Discord (einmalig)
+  law-documents.mjs            Splitter und Discord-Normalisierung
+  publish-laws.mjs             Markdown → Discord
+  sync-laws-from-discord.mjs   Discord → Markdown
 .github/workflows/
-  sync-gesetze-from-discord.yml  Zeitplan und Commit
-  publish-laws.yml               manuelles Veröffentlichen
+  publish-laws.yml               manuelles Veröffentlichen/Update
+  sync-laws-from-discord.yml     Zeitplan und Commit
 test/
-  discord-sync.test.mjs  Tests für die Markdown-Erzeugung
+  law-documents.test.mjs
+  sync-laws.test.mjs
 ```
 
 ## Design anpassen

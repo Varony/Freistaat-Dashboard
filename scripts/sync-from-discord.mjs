@@ -151,10 +151,36 @@ function messageText(message) {
 
   for (const attachment of message.attachments ?? []) {
     const name = attachment.filename ?? "Anhang";
-    if (attachment.url) parts.push(`[${name}](${attachment.url})`);
+    if (attachment.content?.trim()) parts.push(attachment.content.trim());
+    else if (attachment.url) parts.push(`[${name}](${attachment.url})`);
   }
 
   return parts.join("\n");
+}
+
+/**
+ * Lädt Markdown-/Text-Anhänge herunter, damit der Gesetzestext nicht nur als
+ * Link, sondern vollständig im Gesetzblatt landet.
+ */
+async function loadAttachmentContents(messages) {
+  for (const message of messages) {
+    for (const attachment of message.attachments ?? []) {
+      const name = attachment.filename ?? "";
+      if (!attachment.url || !/\.(md|txt)$/i.test(name)) continue;
+
+      try {
+        const response = await fetch(attachment.url);
+        if (!response.ok) {
+          console.warn(`Anhang ${name}: HTTP ${response.status}`);
+          continue;
+        }
+        attachment.content = await response.text();
+        console.log(`Anhang geladen: ${name} (${attachment.content.length} Zeichen)`);
+      } catch (error) {
+        console.warn(`Anhang ${name} konnte nicht geladen werden: ${error.message}`);
+      }
+    }
+  }
 }
 
 function cleanTitle(value) {
@@ -283,6 +309,8 @@ async function main() {
     );
     return;
   }
+
+  await loadAttachmentContents(relevant);
 
   const markdown = buildMarkdown(relevant, channel);
 

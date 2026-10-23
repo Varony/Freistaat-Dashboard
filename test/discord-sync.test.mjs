@@ -58,6 +58,20 @@ test("messageText hängt Anhänge als Links an", () => {
   assert.equal(text, "Gesetzestext\n[anlage.pdf](https://cdn.example/anlage.pdf)");
 });
 
+test("messageText nutzt den Inhalt eines geladenen Markdown-Anhangs", () => {
+  const text = messageText({
+    content: "# Verfassung des Freistaates",
+    attachments: [
+      {
+        filename: "Verfassung des Freistaates.md",
+        content: "Präambel\n\n## Artikel",
+      },
+    ],
+  });
+
+  assert.equal(text, "# Verfassung des Freistaates\nPräambel\n\n## Artikel");
+});
+
 test("isLawMessage ignoriert Bots, Webhooks und Systemnachrichten", () => {
   assert.equal(isLawMessage({ ...baseMessage, content: "Text" }), true);
   assert.equal(isLawMessage({ ...baseMessage, content: "Text", author: { bot: true } }), false);
@@ -105,4 +119,27 @@ test("buildMarkdown erzeugt die Struktur, die lib/laws.ts erwartet", () => {
   assert.equal(sections[0].split("\n")[0].trim(), "§ 1 Keine Strafe ohne Gesetz");
   assert.equal(sections[1].split("\n")[0].trim(), "§ 2 Ort der Tat");
   assert.match(sections[1], /^### Absatz$/m);
+});
+
+test("buildMarkdown übernimmt den Inhalt eines Markdown-Anhangs", () => {
+  const markdown = buildMarkdown(
+    [
+      {
+        ...baseMessage,
+        id: "333333333333333333",
+        timestamp: "2026-10-22T12:00:00.000Z",
+        content: "# Verfassung des Freistaates",
+        attachments: [
+          {
+            filename: "Verfassung des Freistaates.md",
+            content: "Präambel\n\n## Artikel",
+          },
+        ],
+      },
+    ],
+    { id: "999999999999999999", name: "gesetzbuch", guildID: "888888888888888888" },
+  );
+
+  assert.match(markdown, /^## Verfassung des Freistaates$/m);
+  assert.match(markdown, /Präambel\n\n### Artikel/);
 });

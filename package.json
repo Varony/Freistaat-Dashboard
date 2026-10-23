@@ -10,7 +10,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "node --test test/",
+    "test": "node --test test/*.test.mjs",
     "sync:discord": "node --env-file=.env scripts/sync-from-discord.mjs"
   },
   "dependencies": {

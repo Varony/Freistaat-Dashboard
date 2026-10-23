@@ -15,6 +15,7 @@
 
 import { readdir, readFile } from "node:fs/promises";
 import path from "node:path";
+import { pathToFileURL } from "node:url";
 
 const API = "https://discord.com/api/v10";
 const TOKEN = process.env.DISCORD_BOT_TOKEN ?? "";
@@ -64,6 +65,20 @@ function orderIndex(filename) {
   return index === -1 ? ORDER.length : index;
 }
 
+/**
+ * Discord ersetzt Leerzeichen und Umlaute in Dateinamen. Für den
+ * Duplikat-Vergleich werden beide Seiten auf dieselbe Form gebracht.
+ */
+export function normalizeFilename(name) {
+  return String(name ?? "")
+    .toLowerCase()
+    .replace(/ß/g, "ss")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
 async function main() {
   if (!TOKEN) throw new Error("DISCORD_BOT_TOKEN fehlt.");
   if (!/^\d{17,20}$/.test(CHANNEL_ID)) {
@@ -82,14 +97,14 @@ async function main() {
   const existing = await api(`/channels/${CHANNEL_ID}/messages?limit=50`);
   const existingAttachments = new Set(
     existing.flatMap((message) =>
-      (message.attachments ?? []).map((attachment) => attachment.filename),
+      (message.attachments ?? []).map((attachment) => normalizeFilename(attachment.filename)),
     ),
   );
 
   for (const filename of files) {
     const title = filename.replace(/\.md$/i, "");
 
-    if (existingAttachments.has(filename)) {
+    if (existingAttachments.has(normalizeFilename(filename))) {
       console.log(`Überspringe ${filename} (bereits im Channel).`);
       continue;
     }
@@ -126,7 +141,9 @@ async function main() {
   console.log("Fertig.");
 }
 
-main().catch((error) => {
-  console.error(`Fehler: ${error.message}`);
-  process.exitCode = 1;
-});
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  main().catch((error) => {
+    console.error(`Fehler: ${error.message}`);
+    process.exitCode = 1;
+  });
+}

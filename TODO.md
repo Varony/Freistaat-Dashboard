@@ -2,19 +2,22 @@
 
 ## Discord-Bot für den Gesetze-Sync
 
-Der Sync ist aktiv: GitHub Actions liest den Gesetzblatt-Channel alle
-15 Minuten und schreibt `content/Gesetze.md`. Der Bot-Token liegt in den
-Repository-Secrets.
+Der Sync ist aktiv: GitHub Actions liest den Gesetzblatt-Channel (`#gestze`)
+alle 15 Minuten und schreibt `content/Gesetze.md`. Der Bot-Token liegt im
+Secret `BOTTOKEN`, die Channel-ID in der Repository-Variable
+`DISCORD_CHANNEL_ID`.
 
 - [x] Workflow-Zeitplan aktiviert
 - [x] Markdown-Format an `lib/laws.ts` angepasst (`##`-Abschnitte)
 - [x] Discord-Links pro Gesetz und zum Channel
-- [ ] Prüfen, ob `DISCORD_CHANNEL_ID` in den Secrets gesetzt ist
-- [ ] Prüfen, ob der **Message Content Intent** im Developer Portal aktiv ist
-- [ ] Workflow mit `dry_run = true` starten und Ausgabe prüfen
-- [ ] Workflow ohne Dry-Run starten und `content/Gesetze.md` prüfen
-- [ ] Alte Webhook-Secrets entfernen (`DISCORD_WEBHOOK_URL` / `WEBHOOKURL`)
+- [x] `DISCORD_CHANNEL_ID` als Repository-Variable gesetzt
+- [x] Message Content Intent funktioniert
+- [x] Workflow mit `dry_run = true` geprüft
+- [x] Workflow ohne Dry-Run ausgeführt
+- [x] `content/Gesetze.md` enthält die drei Gesetze
+- [x] Drei Ausgangstexte über `publish-laws.yml` in den Channel gepostet
 - [ ] Vercel-Deploy nach dem Sync prüfen
+- [ ] Altes Secret `WEBHOOKURL` entfernen, falls nicht mehr benötigt
 
 ## Echte Abstimmungen (Supabase)
 
@@ -30,6 +33,7 @@ Repository-Secrets.
 ## Offen
 
 - [x] Bestehende `content/*.md` als Fallback für die Website einbinden
-- [ ] Entscheiden, ob der Discord-Sync die drei manuellen Texte ersetzen oder ergänzen soll
-- [ ] Discord-Anhänge dauerhaft speichern (CDN-Links können ablaufen)
+- [x] Discord-Sync übernimmt die drei Gesetzestexte
+- [x] Gesetzestexte werden aus den Anhängen ins Repository übernommen
+- [ ] Entscheiden, ob künftige Gesetzesänderungen nur in Discord oder auch in `content/*.md` gepflegt werden
 - [ ] Alte Webhook-Dokumentation aus der Git-Historie entfernen, falls nicht mehr benötigt

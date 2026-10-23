@@ -24,29 +24,33 @@ npm test        # Tests für den Discord-Sync
 
 ## Discord-Sync
 
-Der Gesetzblatt-Channel wird alle 15 Minuten von GitHub Actions gelesen. Das
-Skript erzeugt daraus `content/Gesetze.md`; jede menschliche Nachricht im
-Channel wird ein `##`-Abschnitt mit Discord-Link und Beschlussdatum. Vercel
-baut die Website nach dem Commit automatisch neu.
+Der Gesetzblatt-Channel (`#gestze`) wird alle 15 Minuten von GitHub Actions
+gelesen. Das Skript erzeugt daraus `content/Gesetze.md`; jede Nachricht mit
+Gesetzestext wird ein `##`-Abschnitt mit Discord-Link und Beschlussdatum.
+Vercel baut die Website nach dem Commit automatisch neu.
 
-Solange `content/Gesetze.md` noch nicht existiert, zeigt die Website die drei
-manuell gepflegten Texte aus `content/`:
+Die drei Ausgangstexte liegen als Markdown-Dateien in `content/`:
 
 - `Verfassung des Freistaates.md`
 - `Recht und Ordnung.md`
 - `Einstweilige Verfügungen.md`
 
-Sobald die Datei aus dem Discord-Sync vorhanden ist, hat sie Vorrang.
+Sie wurden einmalig über den Workflow **Gesetze nach Discord veröffentlichen**
+als Nachrichten mit Markdown-Anhang in den Channel gepostet. Der Sync lädt
+diese Anhänge herunter und übernimmt den vollständigen Text. Solange
+`content/Gesetze.md` fehlt, zeigt die Website die drei Dateien direkt.
 
-Benötigte Repository-Secrets:
+Benötigte Repository-Konfiguration:
 
-| Secret | Bedeutung |
-| --- | --- |
-| `DISCORD_BOT_TOKEN` | Token des Discord-Bots |
-| `DISCORD_CHANNEL_ID` | ID des Gesetzblatt-Channels |
+| Name | Typ | Bedeutung |
+| --- | --- | --- |
+| `BOTTOKEN` | Secret | Token des Discord-Bots (`DISCORD_BOT_TOKEN` wird ebenfalls akzeptiert) |
+| `DISCORD_CHANNEL_ID` | Variable | ID des Gesetzblatt-Channels |
+| `WEBHOOKURL` | Secret | Wird nicht mehr benötigt und kann entfernt werden |
 
-Der Bot benötigt im Channel die Rechte **Channel ansehen** und
-**Nachrichtenverlauf lesen**. Im Developer Portal muss der **Message Content
+Der Bot benötigt im Channel **Channel ansehen** und **Nachrichtenverlauf
+lesen**. Für das einmalige Veröffentlichen zusätzlich **Nachrichten senden**
+und **Dateien anhängen**. Im Developer Portal muss der **Message Content
 Intent** aktiviert sein.
 
 Manuell testen:
@@ -54,6 +58,11 @@ Manuell testen:
 1. GitHub → **Actions** → **Gesetze aus Discord** → **Run workflow**
 2. Zuerst mit `dry_run = true` starten und die Ausgabe prüfen.
 3. Danach ohne Dry-Run starten; der Workflow committet `content/Gesetze.md`.
+
+Gesetze erneut in den Channel posten (überspringt bereits vorhandene Dateien):
+
+1. GitHub → **Actions** → **Gesetze nach Discord veröffentlichen** → **Run workflow**
+2. Optional vorher mit `dry_run = true` prüfen.
 
 Lokal testen (Token nur in der lokalen `.env`, nicht committen):
 
@@ -79,12 +88,14 @@ lib/
 content/
   Verfassung des Freistaates.md
   Recht und Ordnung.md
-  Einstweilige Verfügungen.md   manuell gepflegte Gesetzestexte
-  Gesetze.md                    optional: aus Discord erzeugt, hat Vorrang
+  Einstweilige Verfügungen.md   Ausgangstexte / Fallback
+  Gesetze.md                    aus Discord erzeugt, hat Vorrang
 scripts/
   sync-from-discord.mjs  Discord-Channel → Markdown
+  publish-laws.mjs       content/*.md → Discord (einmalig)
 .github/workflows/
   sync-gesetze-from-discord.yml  Zeitplan und Commit
+  publish-laws.yml               manuelles Veröffentlichen
 test/
   discord-sync.test.mjs  Tests für die Markdown-Erzeugung
 ```

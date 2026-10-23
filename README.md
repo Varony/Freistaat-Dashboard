@@ -28,7 +28,7 @@ Die Gesetze liegen in drei Discord-Channels:
 
 - `#verfassung` – Verfassung des Freistaates
 - `#recht-und-ordnung` – Recht und Ordnung
-- `#verfügungen` – Einstweilige Verfügungen
+- `#verfügen` – Einstweilige Verfügungen
 
 Jedes einzelne Gesetz ist eine eigene Nachricht. Die Zuordnung Dokument →
 Channel → Datei steht in `law-documents.json`.
@@ -53,7 +53,7 @@ Benötigte Repository-Konfiguration:
 | --- | --- | --- |
 | `BOTTOKEN` | Secret | Token des Discord-Bots (`DISCORD_BOT_TOKEN` wird ebenfalls akzeptiert) |
 | `DISCORD_GUILD_ID` | Variable | Server-ID |
-| `DISCORD_CHANNEL_ID` | Variable | Übersichts-Channel `#gestze` |
+| `DISCORD_CHANNEL_ID` | Variable (optional) | Übersichts-Channel für die Index-Nachricht (aktuell nicht gesetzt) |
 | `VERCEL_DEPLOY_HOOK` | Secret (optional) | Vercel Deploy Hook, falls die Git-Integration den Production-Deploy nicht auslöst |
 | `WEBHOOKURL` | Secret | Wird nicht mehr benötigt |
 
@@ -99,7 +99,7 @@ lib/
 content/
   Verfassung des Freistaates.md   aus #verfassung generiert
   Recht und Ordnung.md            aus #recht-und-ordnung generiert
-  Einstweilige Verfügungen.md     aus #verfügungen generiert
+  Einstweilige Verfügungen.md     aus #verfügen generiert
   discord-channels.json           Channel-IDs für die Website
   discord-publish-state.json      Nachrichten-IDs für idempotentes Publishing
 law-documents.json   Dokument → Channel → Datei + Trennregel

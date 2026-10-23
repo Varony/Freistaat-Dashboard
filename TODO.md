@@ -17,11 +17,12 @@ Stand: 23.10.2026
 
 ### Discord-Sync
 
-- [x] Drei Gesetzes-Channels: `#verfassung`, `#recht-und-ordnung`,
-      `#verfügungen`
+- [x] Drei Gesetzes-Channels im Produktionsserver **Freistaat**:
+      `#verfassung`, `#recht-und-ordnung`, `#verfügen`
 - [x] Ein Channel pro Gesetzestext, eine Nachricht pro einzelnem Gesetz
       (29 + 6 + 3 Nachrichten)
-- [x] Übersichts-Channel `#gestze` verlinkt die Gesetzes-Channels
+- [ ] Optional: Übersichts-Channel im Produktionsserver anlegen und als
+      `DISCORD_CHANNEL_ID` setzen (im Testserver existiert `#gestze`)
 - [x] `DISCORD_GUILD_ID` als Repository-Variable gesetzt
 - [x] Publish-Workflow ist idempotent
       (`content/discord-publish-state.json`)

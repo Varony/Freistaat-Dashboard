@@ -14,6 +14,7 @@ jobs:
       - name: Bot-Guilds und Channels auflisten
         env:
           DISCORD_BOT_TOKEN: ${{ secrets.BOTTOKEN || secrets.DISCORD_BOT_TOKEN }}
+          DISCORD_CHANNEL_ID: ${{ vars.DISCORD_CHANNEL_ID || secrets.DISCORD_CHANNEL_ID }}
         run: |
           node --input-type=module <<'EOF'
           const token = process.env.DISCORD_BOT_TOKEN;
@@ -50,6 +51,27 @@ jobs:
               if (!types[channel.type]) continue;
               const parent = channel.parent_id ? ` (Kategorie ${channel.parent_id})` : "";
               console.log(`${types[channel.type].padEnd(8)} #${channel.name} -> ${channel.id}${parent}`);
+            }
+          }
+
+          const channelID = process.env.DISCORD_CHANNEL_ID;
+          if (channelID) {
+            console.log(`\n== Nachrichten in ${channelID} ==`);
+            try {
+              const messages = await api(`/channels/${channelID}/messages?limit=20`);
+              console.log(`Nachrichten: ${messages.length}`);
+              for (const message of messages) {
+                const content = message.content ?? "";
+                console.log(
+                  `- ${message.id} | ${message.author?.username ?? "?"} | ` +
+                    `bot=${message.author?.bot ?? false} | webhook=${message.webhook_id ?? "-"} | ` +
+                    `type=${message.type} | content=${content.length} | ` +
+                    `attachments=${message.attachments?.length ?? 0}`,
+                );
+                if (content) console.log(`  ${content.slice(0, 120).replace(/\n/g, " ")}`);
+              }
+            } catch (error) {
+              console.log(`FEHLER beim Lesen: ${error.message}`);
             }
           }
           EOF

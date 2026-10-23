@@ -38,6 +38,11 @@ Stand: 23.10.2026
       Sync-Snapshot. Künftige Gesetzesänderungen also in Discord vornehmen.
 - [ ] Alte Attachment-Nachrichten in `#gestze` löschen, falls nicht als
       Archiv benötigt
+- [ ] Vercel: **Production Branch** auf `master` prüfen bzw. das neueste
+      Deployment promoten. Die Live-Domain zeigte zuletzt noch einen älteren
+      Build, obwohl die Deployments erfolgreich waren.
+- [ ] Optional: Vercel Deploy Hook als Secret `VERCEL_DEPLOY_HOOK` hinterlegen
+      (die Workflows unterstützen ihn bereits).
 
 ## Offen – Website vervollständigen
 

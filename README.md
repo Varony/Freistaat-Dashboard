@@ -54,12 +54,18 @@ Benötigte Repository-Konfiguration:
 | `BOTTOKEN` | Secret | Token des Discord-Bots (`DISCORD_BOT_TOKEN` wird ebenfalls akzeptiert) |
 | `DISCORD_GUILD_ID` | Variable | Server-ID |
 | `DISCORD_CHANNEL_ID` | Variable | Übersichts-Channel `#gestze` |
+| `VERCEL_DEPLOY_HOOK` | Secret (optional) | Vercel Deploy Hook, falls die Git-Integration den Production-Deploy nicht auslöst |
 | `WEBHOOKURL` | Secret | Wird nicht mehr benötigt |
 
 Der Bot benötigt **Channel ansehen**, **Nachrichtenverlauf lesen**,
 **Nachrichten senden**, **Nachrichten verwalten** und **Channels verwalten**
 (für das Anlegen und Aktualisieren der Gesetzes-Channels). Im Developer Portal
 muss der **Message Content Intent** aktiviert sein.
+
+Für Vercel muss der **Production Branch** auf `master` stehen. Falls die
+Live-Domain trotz erfolgreicher Deployments einen alten Stand zeigt, hilft ein
+Deploy Hook (Vercel → Settings → Git → Deploy Hooks), der als Secret
+`VERCEL_DEPLOY_HOOK` hinterlegt wird.
 
 Manuell:
 

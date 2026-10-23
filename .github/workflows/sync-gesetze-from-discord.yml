@@ -57,12 +57,20 @@ jobs:
       - name: Ergebnis prüfen
         if: ${{ !inputs.dry_run && steps.config.outputs.skip != 'true' }}
         run: |
-          test -s content/Gesetze.md
+          if [ ! -s content/Gesetze.md ]; then
+            echo "Keine Gesetze vorhanden – überspringe Commit."
+            exit 0
+          fi
           grep -q '^## ' content/Gesetze.md
 
       - name: Änderung committen
         if: ${{ !inputs.dry_run && steps.config.outputs.skip != 'true' }}
         run: |
+          if [ ! -f content/Gesetze.md ]; then
+            echo "Keine Datei – nichts zu committen."
+            exit 0
+          fi
+
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 

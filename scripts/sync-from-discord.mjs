@@ -276,11 +276,12 @@ async function main() {
   const relevant = messages.filter(isLawMessage);
 
   if (relevant.length === 0) {
-    throw new Error(
-      "Keine verwertbaren Nachrichten gefunden. Prüfe: Ist der Bot im Channel? " +
-        "Ist das „Message Content Intent“ im Developer Portal aktiv? " +
-        "Gibt es Nachrichten von Menschen?",
+    console.warn(
+      `Keine verwertbaren Nachrichten gefunden (${messages.length} Nachrichten im Channel). ` +
+        "Der Lauf wird übersprungen. Sobald Gesetze im Channel stehen, wird die Datei erzeugt. " +
+        "Prüfe bei Bedarf das „Message Content Intent“ und die Bot-Rechte.",
     );
+    return;
   }
 
   const markdown = buildMarkdown(relevant, channel);

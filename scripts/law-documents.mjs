@@ -17,7 +17,10 @@ export function splitDocument(text, document) {
   const pattern = PATTERNS[document.kind];
   if (!pattern) throw new Error(`Unbekannter Dokumenttyp: ${document.kind}`);
 
-  const normalized = String(text ?? "").replace(/\r\n/g, "\n").trim();
+  const normalized = String(text ?? "")
+    .replace(/<!--[\s\S]*?-->/g, "")
+    .replace(/\r\n/g, "\n")
+    .trim();
   if (!normalized) return [];
 
   return normalized

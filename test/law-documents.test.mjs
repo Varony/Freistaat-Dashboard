@@ -26,6 +26,16 @@ test("splitDocument teilt Kapitel und Artikel", () => {
   assert.match(units[2], /^#### Art 1/);
 });
 
+test("splitDocument ignoriert Sync-Kommentare", () => {
+  const units = splitDocument(
+    "<!-- discord-channel:1 -->\n<!-- discord-guild:2 -->\n# § 1 A\nText",
+    { kind: "paragraphs" },
+  );
+  assert.equal(units.length, 1);
+  assert.match(units[0], /^# § 1/);
+  assert.doesNotMatch(units[0], /discord-channel/);
+});
+
 test("normalizeForDiscord macht aus H4 H3", () => {
   assert.equal(normalizeForDiscord("#### Art 1\nText"), "### Art 1\nText");
   assert.equal(normalizeForDiscord("### Art 1"), "### Art 1");

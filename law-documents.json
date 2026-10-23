@@ -2,7 +2,7 @@
   {
     "title": "Verfassung des Freistaates",
     "file": "Verfassung des Freistaates.md",
-    "channel": "verfassung-des-freistaates",
+    "channel": "verfassung",
     "kind": "headings",
     "separator": "\n\n"
   },
@@ -16,7 +16,7 @@
   {
     "title": "Einstweilige Verfügungen",
     "file": "Einstweilige Verfügungen.md",
-    "channel": "einstweilige-verfuegungen",
+    "channel": "verfügungen",
     "kind": "numbered",
     "separator": "\n"
   }

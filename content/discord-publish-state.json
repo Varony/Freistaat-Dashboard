@@ -5,11 +5,11 @@
       "messages": [
         {
           "index": 0,
-          "heading": "<!-- Automatisch aus Discord #verfassung generiert. Nicht direkt bearbeiten. -->",
+          "heading": "Im Bewußtsein seiner Verantwortung vor Gott und den Menschen,",
           "messageIDs": [
             "1562997637291053157"
           ],
-          "hash": "f8d9ee74a867bcab168570247ef9ef016ca2adf4"
+          "hash": "f6156ea9ac294c4bfbef736037fb12ce307d9736"
         },
         {
           "index": 1,
@@ -244,57 +244,49 @@
       "messages": [
         {
           "index": 0,
-          "heading": "<!-- Automatisch aus Discord #recht-und-ordnung generiert. Nicht direkt bearbei…",
-          "messageIDs": [
-            "1562997792173981697"
-          ],
-          "hash": "fbb7ec541432c855c405d0febc80331e3fa04264"
-        },
-        {
-          "index": 1,
           "heading": "# § 1 Keine Strafe ohne Gesetz",
           "messageIDs": [
-            "1562997797228118108"
+            "1562997792173981697"
           ],
           "hash": "da46d4fce9adf2785b0c6be7bc19563a78ba91a1"
         },
         {
-          "index": 2,
+          "index": 1,
           "heading": "# § 2 Ort der Tat",
           "messageIDs": [
-            "1562997802316071053"
+            "1562997797228118108"
           ],
           "hash": "24d7b9a3f39be2504474722f822209acacef7138"
         },
         {
-          "index": 3,
+          "index": 2,
           "heading": "# § 3 Personenbegriffe",
           "messageIDs": [
-            "1562997807256961056"
+            "1562997802316071053"
           ],
           "hash": "c2d82ff144992ba90485688af6043d38cd30042d"
         },
         {
-          "index": 4,
+          "index": 3,
           "heading": "# § 4 Sachbegriffe",
           "messageIDs": [
-            "1562997812151455878"
+            "1562997807256961056"
           ],
           "hash": "1284a35dc0886969b4ed190538fcf26ddd580e12"
         },
         {
-          "index": 5,
+          "index": 4,
           "heading": "## § 5 Schuld",
           "messageIDs": [
-            "1562997817323167835"
+            "1562997812151455878"
           ],
           "hash": "a81a2df3b82e56262659aab94ebadc3d0c8ee911"
         },
         {
-          "index": 6,
+          "index": 5,
           "heading": "# § 2 Rechtsprechung, durch Richter und Volk",
           "messageIDs": [
-            "1562998216591675404"
+            "1562997817323167835"
           ],
           "hash": "b91c12d85169aa4652236445ff60c46e75cb3af1"
         }
@@ -307,33 +299,25 @@
       "messages": [
         {
           "index": 0,
-          "heading": "<!-- Automatisch aus Discord #verfügungen generiert. Nicht direkt bearbeiten. -…",
-          "messageIDs": [
-            "1562997822754787421"
-          ],
-          "hash": "790c8358310d90f22dbbc4c071371852b13982d4"
-        },
-        {
-          "index": 1,
           "heading": "1. Bis das GG sowie RO fertiggestellt sind dürfen durch den Chef ausgewählte Pe…",
           "messageIDs": [
-            "1562997827670642712"
+            "1562997822754787421"
           ],
           "hash": "3d6eaa5923ede3dd3355393ad5a47a5a79ffc49e"
         },
         {
-          "index": 2,
+          "index": 1,
           "heading": "2. Verfügungen treten sofort in kraft",
           "messageIDs": [
-            "1562997833223643147"
+            "1562997827670642712"
           ],
           "hash": "4fb70806766841ebe8755945ec9a02c388d3b970"
         },
         {
-          "index": 3,
+          "index": 2,
           "heading": "3. sobald eine absolute Mehrheit des gesamten Volkes beschließt, dass das Geset…",
           "messageIDs": [
-            "1562998239366615053"
+            "1562997833223643147"
           ],
           "hash": "1bbdb0d407362cd8a004caebae1354f0c4fb88c5"
         }

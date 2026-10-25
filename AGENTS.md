@@ -26,8 +26,8 @@ node --test test/law-documents.test.mjs   # einzelne Testdatei
 node --test bot/test/format.test.js
 ```
 
-`.github/workflows/ci.yml` prüft Lint, Tests und Build für Website und Bot.
-Die Sync-Workflows führen zusätzlich `npm test` aus.
+`.github/workflows/ci.yml` prüft die Website (Lint, Tests, Build) und den Bot
+(Tests).
 
 ## Gesetze und `content/`
 

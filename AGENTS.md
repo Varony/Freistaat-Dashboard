@@ -26,8 +26,8 @@ node --test test/law-documents.test.mjs   # einzelne Testdatei
 node --test bot/test/format.test.js
 ```
 
-CI (`.github/workflows/`) führt nur `npm test` aus. Lint, Build und Bot-Tests
-laufen dort nicht – vor dem Push selbst prüfen.
+`.github/workflows/ci.yml` prüft Lint, Tests und Build für Website und Bot.
+Die Sync-Workflows führen zusätzlich `npm test` aus.
 
 ## Gesetze und `content/`
 
@@ -95,6 +95,12 @@ testen, nie ungetestet auf Produktion.
 - Kein Backend, keine Auth: Wahlen, Parteien und Begehren sind Mock-Daten aus
   `lib/mock-data.ts`; Stimmen und Unterschriften liegen nur im `localStorage`
   (`lib/use-local-storage.ts`).
+- Status und Fristen kommen aus `lib/status.ts`, nicht aus dem `status`-Feld
+  der Mock-Daten. Seiten mit Fristen setzen `revalidate = 300`.
+- Kandidatur, Parteigründung und Begehren-Einreichung sind bewusst Demo und
+  müssen so gekennzeichnet bleiben, bis Supabase angebunden ist.
+- Kanonische URL: `NEXT_PUBLIC_SITE_URL`, Fallback ist die Vercel-Domain
+  (`lib/site-config.ts`).
 - Oberfläche ist deutsch; neue Texte ebenfalls.
 
 ## Commits

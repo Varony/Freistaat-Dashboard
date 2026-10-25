@@ -7,3 +7,4 @@
 2. Verfügungen treten sofort in kraft
 3. sobald eine absolute Mehrheit des gesamten Volkes beschließt, dass das Gesetzt nun soweit fertig ist, wird das Komitee aufgelöst
 Wann wird dieses Komitee aufgestellt?
+4. Solange das Regelwerk über die guten Sitten vom Kultusminister nicht vollständig ist entscheidet der oberste Gerichtshof über diese

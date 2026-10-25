@@ -1,4 +1,5 @@
 import type { Candidate, Election, Initiative, Law, Party } from "./types";
+import { deriveElectionStatus, deriveInitiativeStatus } from "./status";
 
 export const parties: Party[] = [
   {
@@ -295,12 +296,35 @@ export function getParty(id?: string): Party | undefined {
   return parties.find((party) => party.id === id);
 }
 
-export function getElection(slug: string): Election | undefined {
-  return elections.find((election) => election.slug === slug);
+export function getElection(slug: string, now: Date = new Date()): Election | undefined {
+  const election = elections.find((entry) => entry.slug === slug);
+  return election
+    ? { ...election, status: deriveElectionStatus(election, now) }
+    : undefined;
 }
 
-export function getInitiative(slug: string): Initiative | undefined {
-  return initiatives.find((initiative) => initiative.slug === slug);
+export function getElections(now: Date = new Date()): Election[] {
+  return elections.map((election) => ({
+    ...election,
+    status: deriveElectionStatus(election, now),
+  }));
+}
+
+export function getInitiative(
+  slug: string,
+  now: Date = new Date(),
+): Initiative | undefined {
+  const initiative = initiatives.find((entry) => entry.slug === slug);
+  return initiative
+    ? { ...initiative, status: deriveInitiativeStatus(initiative, now) }
+    : undefined;
+}
+
+export function getInitiatives(now: Date = new Date()): Initiative[] {
+  return initiatives.map((initiative) => ({
+    ...initiative,
+    status: deriveInitiativeStatus(initiative, now),
+  }));
 }
 
 export { tim, jascha, andre, jakob, lorenz, sprit };

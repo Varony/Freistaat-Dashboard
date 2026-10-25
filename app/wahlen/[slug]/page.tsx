@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
-  IconArrowRight,
   IconCalendar,
   IconCheck,
   IconShield,
@@ -19,9 +18,13 @@ import {
   buttonClasses,
 } from "@/components/ui";
 import { VoteForm, type VoteOption } from "@/components/vote-form";
-import { deadlineLabel, formatDate, percent } from "@/lib/format";import { electionStatusMeta } from "@/lib/labels";
+import { DiscordLink } from "@/components/discord-link";
+import { deadlineLabel, formatDate, percent } from "@/lib/format";
+import { electionStatusMeta } from "@/lib/labels";
 import { elections, getElection, getParty } from "@/lib/mock-data";
 import { cn } from "@/lib/utils";
+
+export const revalidate = 300;
 
 export function generateStaticParams() {
   return elections.map((election) => ({ slug: election.slug }));
@@ -50,6 +53,7 @@ export default async function ElectionPage({
   const status = electionStatusMeta[election.status];
   const isOpen = election.status === "open";
   const isClosed = election.status === "closed" || election.status === "published";
+  const hasResult = Boolean(election.result?.length);
   const totalVotes = election.result?.reduce((sum, item) => sum + item.votes, 0) ?? 0;
 
   const voteOptions: VoteOption[] =
@@ -98,9 +102,13 @@ export default async function ElectionPage({
           },
           {
             title: "Ergebnis",
-            detail: isClosed ? "veröffentlicht" : "nach Ende der Abstimmung",
-            done: isClosed,
-            current: isClosed,
+            detail: hasResult
+              ? "veröffentlicht"
+              : isClosed
+                ? "wird ausgezählt"
+                : "nach Ende der Abstimmung",
+            done: hasResult,
+            current: isClosed && !hasResult,
           },
         ]
       : [
@@ -124,9 +132,13 @@ export default async function ElectionPage({
           },
           {
             title: "Ergebnis",
-            detail: isClosed ? "veröffentlicht" : "nach Ende der Abstimmung",
-            done: isClosed,
-            current: isClosed,
+            detail: hasResult
+              ? "veröffentlicht"
+              : isClosed
+                ? "wird ausgezählt"
+                : "nach Ende der Abstimmung",
+            done: hasResult,
+            current: isClosed && !hasResult,
           },
         ];
 
@@ -377,13 +389,15 @@ export default async function ElectionPage({
                   Die Abstimmung beginnt am {formatDate(election.candidacyEndsAt)}.
                   Bis dahin können Kandidaturen eingereicht und geprüft werden.
                 </p>
-                <Link
-                  href="/profil"
-                  className={buttonClasses("secondary", "sm", "mt-4")}
-                >
-                  Kandidatur einreichen
-                  <IconArrowRight className="h-3.5 w-3.5" />
-                </Link>
+                <div className="mt-4 flex flex-wrap items-center gap-3">
+                  <DiscordLink
+                    label="Im Discord bewerben"
+                    className={buttonClasses("secondary", "sm")}
+                  />
+                  <span className="text-xs text-faint">
+                    Demo – die Einreichung über die Website folgt.
+                  </span>
+                </div>
               </Card>
             )}
           </section>

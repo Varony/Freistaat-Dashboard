@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { NavLinks } from "@/components/nav-links";
 import { MobileNav } from "@/components/mobile-nav";
+import { DiscordLink } from "@/components/discord-link";
 import { buttonClasses, Container } from "@/components/ui";
 import { siteConfig } from "@/lib/site-config";
 
@@ -25,7 +26,11 @@ export function SiteHeader() {
         <NavLinks className="hidden md:flex" />
 
         <div className="hidden items-center gap-2 md:flex">
-          <Link href="/profil" className={buttonClasses("secondary", "sm")}>
+          <DiscordLink
+            label="Discord"
+            className={buttonClasses("secondary", "sm")}
+          />
+          <Link href="/profil" className={buttonClasses("ghost", "sm")}>
             Anmelden
           </Link>
         </div>

@@ -26,6 +26,8 @@ import {
 } from "@/lib/mock-data";
 import { cn } from "@/lib/utils";
 
+export const revalidate = 300;
+
 export function generateStaticParams() {
   return initiatives.map((initiative) => ({ slug: initiative.slug }));
 }

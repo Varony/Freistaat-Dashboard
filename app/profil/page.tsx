@@ -1,6 +1,13 @@
 import type { Metadata } from "next";
+import { DiscordLink } from "@/components/discord-link";
 import { IconCheck, IconShield, IconUsers, IconVote } from "@/components/icons";
-import { Avatar, Badge, Card, Container } from "@/components/ui";
+import {
+  Avatar,
+  Badge,
+  buttonClasses,
+  Card,
+  Container,
+} from "@/components/ui";
 
 export const metadata: Metadata = {
   title: "Profil",
@@ -17,8 +24,8 @@ export default function ProfilePage() {
             Profil
           </h1>
           <p className="mt-4 max-w-2xl text-base leading-relaxed text-muted">
-            Mit Discord anmelden, um abzustimmen, zu unterschreiben und zu
-            kandidieren.
+            Die Anmeldung über Discord ist noch nicht angeschlossen. Danach
+            kannst du abstimmen, unterschreiben und kandidieren.
           </p>
         </Container>
       </section>
@@ -53,8 +60,16 @@ export default function ProfilePage() {
                 disabled
                 className="mt-5 inline-flex h-11 cursor-not-allowed items-center justify-center rounded-full bg-accent px-5 text-sm font-medium text-accent-contrast opacity-40"
               >
-                Mit Discord anmelden
+                Anmeldung folgt
               </button>
+              <p className="mt-3 text-xs leading-relaxed text-faint">
+                Demo: Die Anmeldung ist noch nicht angeschlossen. Der
+                Discord-Server ist bereits offen.
+              </p>
+              <DiscordLink
+                label="Discord beitreten"
+                className={buttonClasses("secondary", "sm", "mt-4")}
+              />
             </div>
           </Card>
 

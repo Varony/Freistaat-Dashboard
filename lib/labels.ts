@@ -8,7 +8,7 @@ export const electionStatusMeta: Record<
 > = {
   candidacy: { label: "Bewerbungsphase", tone: "warning" },
   open: { label: "Abstimmung läuft", tone: "success" },
-  closed: { label: "Ausgezählt", tone: "default" },
+  closed: { label: "Abgeschlossen", tone: "default" },
   published: { label: "Veröffentlicht", tone: "default" },
 };
 

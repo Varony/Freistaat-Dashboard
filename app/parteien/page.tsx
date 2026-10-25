@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { PartyCard } from "@/components/party-card";
-import { Badge, Card, Container } from "@/components/ui";
+import { DemoNotice } from "@/components/demo-notice";
+import { DiscordLink } from "@/components/discord-link";
+import { Badge, buttonClasses, Container } from "@/components/ui";
 import { parties } from "@/lib/mock-data";
 
 export const metadata: Metadata = {
@@ -31,23 +33,20 @@ export default function PartiesPage() {
           ))}
         </div>
 
-        <Card className="mt-10 border-dashed bg-surface/40 p-6 sm:p-8">
-          <div className="flex flex-wrap items-center justify-between gap-4">
-            <div>
-              <p className="text-sm font-semibold text-text">
-                Eigene Partei gründen?
-              </p>
-              <p className="mt-1 max-w-xl text-sm leading-relaxed text-muted">
-                Gründungen brauchen mindestens drei bestätigte Mitglieder und die
-                Freigabe durch die Wahlleitung. Der Antrag läuft später über
-                Discord.
-              </p>
-            </div>
-            <span className="rounded-full border border-border bg-surface-2 px-4 py-2 text-xs text-faint">
-              Gründung folgt
-            </span>
-          </div>
-        </Card>
+        <DemoNotice
+          className="mt-10"
+          title="Eigene Partei gründen?"
+          action={
+            <DiscordLink
+              label="Im Discord gründen"
+              className={buttonClasses("secondary", "sm")}
+            />
+          }
+        >
+          Gründungen brauchen mindestens drei bestätigte Mitglieder und die
+          Freigabe durch die Wahlleitung. Die Gründung läuft über den
+          Discord-Server.
+        </DemoNotice>
       </Container>
     </>
   );

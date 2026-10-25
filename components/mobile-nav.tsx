@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { IconMenu, IconX } from "@/components/icons";
+import { DiscordLink } from "@/components/discord-link";
 import { buttonClasses } from "@/components/ui";
 import { NavLinks } from "./nav-links";
 
@@ -36,8 +37,12 @@ export function MobileNav() {
             onClick={() => setOpen(false)}
             className={buttonClasses("secondary", "md", "mt-4 w-full")}
           >
-            Mit Discord anmelden
+            Anmelden
           </Link>
+          <DiscordLink
+            label="Discord beitreten"
+            className={buttonClasses("secondary", "md", "mt-2 w-full")}
+          />
         </div>
       ) : null}
     </div>

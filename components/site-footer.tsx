@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { Container } from "@/components/ui";
+import { DiscordLink } from "@/components/discord-link";
+import { buttonClasses, Container } from "@/components/ui";
 import { siteConfig } from "@/lib/site-config";
 
 export function SiteFooter() {
@@ -17,6 +18,10 @@ export function SiteFooter() {
             Prototyp mit Beispieldaten. Es werden noch keine echten Stimmen
             gespeichert.
           </p>
+          <DiscordLink
+            label="Discord-Server"
+            className={buttonClasses("secondary", "sm", "mt-5")}
+          />
         </div>
 
         <div>

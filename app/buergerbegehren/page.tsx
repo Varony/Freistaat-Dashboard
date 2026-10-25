@@ -1,8 +1,18 @@
 import type { Metadata } from "next";
 import { InitiativeCard } from "@/components/initiative-card";
-import { Badge, Card, Container, SectionHeading } from "@/components/ui";
-import { initiatives } from "@/lib/mock-data";
+import { DemoNotice } from "@/components/demo-notice";
+import { DiscordLink } from "@/components/discord-link";
+import {
+  Badge,
+  buttonClasses,
+  Card,
+  Container,
+  SectionHeading,
+} from "@/components/ui";
+import { getInitiatives } from "@/lib/mock-data";
 import type { Initiative, InitiativeStatus } from "@/lib/types";
+
+export const revalidate = 300;
 
 export const metadata: Metadata = {
   title: "Bürgerbegehren",
@@ -40,6 +50,8 @@ const groups: Array<{
 ];
 
 export default function InitiativesPage() {
+  const initiativeList = getInitiatives();
+
   return (
     <>
       <section className="border-b border-border">
@@ -90,7 +102,7 @@ export default function InitiativesPage() {
 
         <div className="mt-14 space-y-14">
           {groups.map((group) => {
-            const items: Initiative[] = initiatives.filter((initiative) =>
+            const items: Initiative[] = initiativeList.filter((initiative) =>
               group.statuses.includes(initiative.status),
             );
 
@@ -113,22 +125,19 @@ export default function InitiativesPage() {
           })}
         </div>
 
-        <Card className="mt-16 border-dashed bg-surface/40 p-6 sm:p-8">
-          <div className="flex flex-wrap items-center justify-between gap-4">
-            <div>
-              <p className="text-sm font-semibold text-text">
-                Eigenes Bürgerbegehren starten?
-              </p>
-              <p className="mt-1 max-w-xl text-sm leading-relaxed text-muted">
-                Im nächsten Ausbau kann jedes Mitglied ein Begehren direkt
-                einreichen. Bis dahin läuft die Einreichung über den Discord-Server.
-              </p>
-            </div>
-            <span className="rounded-full border border-border bg-surface-2 px-4 py-2 text-xs text-faint">
-              Einreichung folgt
-            </span>
-          </div>
-        </Card>
+        <DemoNotice
+          className="mt-16"
+          title="Eigenes Bürgerbegehren starten?"
+          action={
+            <DiscordLink
+              label="Im Discord einreichen"
+              className={buttonClasses("secondary", "sm")}
+            />
+          }
+        >
+          Im nächsten Ausbau kann jedes Mitglied ein Begehren direkt einreichen.
+          Bis dahin läuft die Einreichung über den Discord-Server.
+        </DemoNotice>
       </Container>
     </>
   );

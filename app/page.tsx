@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ElectionCard } from "@/components/election-card";
+import { DiscordLink } from "@/components/discord-link";
 import { IconArrowRight, IconFile, IconUsers, IconVote } from "@/components/icons";
 import { InitiativeCard } from "@/components/initiative-card";
 import { PartyCard } from "@/components/party-card";
@@ -13,15 +14,24 @@ import {
 } from "@/components/ui";
 import { formatDate } from "@/lib/format";
 import { getLaws } from "@/lib/laws";
-import { elections, initiatives, parties, statistics } from "@/lib/mock-data";
+import {
+  getElections,
+  getInitiatives,
+  parties,
+  statistics,
+} from "@/lib/mock-data";
+
+export const revalidate = 300;
 
 export default async function HomePage() {
   const laws = await getLaws();
+  const electionList = getElections();
+  const initiativeList = getInitiatives();
 
-  const runningElections = elections.filter(
+  const runningElections = electionList.filter(
     (election) => election.status === "open" || election.status === "candidacy",
   );
-  const activeInitiatives = initiatives.filter(
+  const activeInitiatives = initiativeList.filter(
     (initiative) =>
       initiative.status === "collecting" || initiative.status === "qualified",
   );
@@ -205,12 +215,10 @@ export default async function HomePage() {
                 </li>
               ))}
             </ol>
-            <Link
-              href="/profil"
+            <DiscordLink
+              label="Discord beitreten"
               className={buttonClasses("secondary", "sm", "mt-6 w-full")}
-            >
-              Mit Discord anmelden
-            </Link>
+            />
           </Card>
         </section>
 

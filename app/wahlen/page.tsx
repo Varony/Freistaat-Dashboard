@@ -1,8 +1,18 @@
 import type { Metadata } from "next";
 import { ElectionCard } from "@/components/election-card";
-import { Badge, Card, Container, SectionHeading } from "@/components/ui";
-import { elections } from "@/lib/mock-data";
+import { DemoNotice } from "@/components/demo-notice";
+import { DiscordLink } from "@/components/discord-link";
+import {
+  Badge,
+  buttonClasses,
+  Card,
+  Container,
+  SectionHeading,
+} from "@/components/ui";
+import { getElections } from "@/lib/mock-data";
 import type { Election, ElectionStatus } from "@/lib/types";
+
+export const revalidate = 300;
 
 export const metadata: Metadata = {
   title: "Wahlen",
@@ -31,11 +41,13 @@ const groups: Array<{
     statuses: ["closed", "published"],
     eyebrow: "Archiv",
     title: "Abgeschlossene Wahlen",
-    description: "Ausgezählte und veröffentlichte Ergebnisse zum Nachlesen.",
+    description: "Abgeschlossene und veröffentlichte Wahlen zum Nachlesen.",
   },
 ];
 
 export default function ElectionsPage() {
+  const electionList = getElections();
+
   return (
     <>
       <section className="border-b border-border">
@@ -54,7 +66,7 @@ export default function ElectionsPage() {
       <Container className="py-10 sm:py-14">
         <div className="space-y-14">
           {groups.map((group) => {
-            const items: Election[] = elections.filter((election) =>
+            const items: Election[] = electionList.filter((election) =>
               group.statuses.includes(election.status),
             );
 
@@ -108,6 +120,20 @@ export default function ElectionsPage() {
             ))}
           </div>
         </Card>
+
+        <DemoNotice
+          className="mt-3"
+          title="Kandidatur einreichen"
+          action={
+            <DiscordLink
+              label="Im Discord bewerben"
+              className={buttonClasses("secondary", "sm")}
+            />
+          }
+        >
+          Kandidaturen können noch nicht über die Website eingereicht werden.
+          Der Einstieg läuft über den Discord-Server.
+        </DemoNotice>
       </Container>
     </>
   );

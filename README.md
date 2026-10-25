@@ -12,6 +12,9 @@ Das Repository enthält zwei Teile:
 Aktueller Stand der Website: **klickbarer Prototyp mit Beispieldaten**. Das
 Gesetzblatt wird bereits automatisch aus Discord synchronisiert. Anmeldung und
 echte Stimmabgabe fehlen noch; die übrigen Daten liegen in `lib/mock-data.ts`.
+Status und Fristen werden aus den Daten abgeleitet. Kandidatur,
+Parteigründung und Bürgerbegehren-Einreichung sind als Demo gekennzeichnet –
+der tatsächliche Weg führt über den Discord-Server.
 
 ## Entwicklung
 

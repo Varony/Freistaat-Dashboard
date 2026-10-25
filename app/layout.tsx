@@ -5,11 +5,23 @@ import { siteConfig } from "@/lib/site-config";
 import "./globals.css";
 
 export const metadata: Metadata = {
+  metadataBase: new URL(siteConfig.url),
+  applicationName: siteConfig.name,
   title: {
     default: `${siteConfig.name} – ${siteConfig.claim}`,
     template: `%s · ${siteConfig.name}`,
   },
   description: siteConfig.description,
+  openGraph: {
+    type: "website",
+    locale: "de_DE",
+    siteName: siteConfig.name,
+    title: `${siteConfig.name} – ${siteConfig.claim}`,
+    description: siteConfig.description,
+  },
+  twitter: {
+    card: "summary_large_image",
+  },
 };
 
 export default function RootLayout({

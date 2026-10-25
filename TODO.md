@@ -120,16 +120,22 @@ Stand: 25.10.2026
       `publish_election(...)`
 - [x] RLS: öffentliche Inhalte lesbar, Profile/Stimmen/Unterschriften nur
       eigene, Schreiben nur für angemeldete Bürger
-- [x] Migration gegen echtes Postgres getestet (19/19 Checks: RLS, eine
-      Stimme, Fristen, Unterschriften, Admin-Publish)
+- [x] Migration gegen echtes Postgres getestet (24/24 Checks: Anon-Zugriff,
+      RLS, eine Stimme, Fristen, Unterschriften, Admin-Publish)
+
+### Manuell erledigt
+
+- [x] Cloud-Projekt `zoialgaxexdfpjnohaza` und Migration ausgeführt
+- [x] Discord als Provider aktiviert, Redirect-URLs in Discord und Supabase
+- [x] Lokale `.env.local` mit Projekt-URL und Publishable Key
+- [x] Login im Browser getestet; Profil wird angelegt (`citizen_count` steigt)
 
 ### Offen (manuell)
 
-- [ ] Cloud-Projekt: Migration im Supabase SQL Editor ausführen
-- [ ] Discord als Provider aktivieren (Client-ID/Secret und Redirect-URL)
+- [ ] Stimme und Unterschrift im Livebetrieb testen (letzter offener
+      Funktionstest; laut Server-Log noch keine Server Action ausgelöst)
 - [ ] `NEXT_PUBLIC_SUPABASE_URL` und `NEXT_PUBLIC_SUPABASE_ANON_KEY` in Vercel
       setzen und neu deployen
-- [ ] Login, Stimme und Unterschrift im Livebetrieb testen
 - [ ] Wahlleitung: eigenes Profil auf `role = 'admin'` setzen
 - [ ] Discord-Rollenprüfung für „Bürger“ (aktuell darf jedes angemeldete Konto
       wählen)

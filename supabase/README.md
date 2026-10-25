@@ -11,7 +11,7 @@ In `.env.local` (lokal) und bei Vercel eintragen:
 | Variable | Bedeutung |
 | --- | --- |
 | `NEXT_PUBLIC_SUPABASE_URL` | Projekt-URL, z. B. `https://abcdefgh.supabase.co` |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Öffentlicher anon key aus **Project Settings → API** |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Öffentlicher anon key aus **Project Settings → API**; Supabase nennt ihn inzwischen auch **publishable key** (`sb_publishable_…`) |
 | `NEXT_PUBLIC_SITE_URL` | Kanonische Website-URL (optional, Fallback ist die Vercel-Domain) |
 
 Der **service_role key wird nicht verwendet** und darf weder ins Repository

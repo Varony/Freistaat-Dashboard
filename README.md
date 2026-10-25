@@ -50,8 +50,8 @@ Details: [Discord-Bot](#discord-bot) unten.
 
 Die Website nutzt Supabase für Discord-Login, Stimmen und Unterschriften. Ohne
 `NEXT_PUBLIC_SUPABASE_URL` und `NEXT_PUBLIC_SUPABASE_ANON_KEY` läuft sie mit
-Mock-Daten weiter; der anon key ist öffentlich, der service_role key wird
-nicht benötigt.
+Mock-Daten weiter; der anon key ist öffentlich (Supabase nennt ihn auch
+publishable key), der service_role key wird nicht benötigt.
 
 ```bash
 cp .env.example .env.local

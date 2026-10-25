@@ -67,7 +67,8 @@ Stand: 23.10.2026
 
 - [ ] Befehle für Gesetzes-Überprüfung im Bot ergänzen (im alten README
       angekündigt, in `src/` aber noch nicht umgesetzt)
-- [ ] Bot als systemd-User-Dienst einrichten (`bot/README.md`)
+- [ ] Bot als systemd-User-Dienst aktivieren (`freistaat-bot`, Unit liegt
+      bereit, muss nur noch enabled werden – siehe `README.md`)
 - [ ] Entscheiden, ob der Bot die Sync-Skripte aus `scripts/` aufrufen soll
       statt eigener Logik
 

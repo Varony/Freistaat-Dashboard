@@ -128,3 +128,18 @@ test/
 npm test        # hier im bot/-Ordner
 npm run test:bot  # aus dem Repository-Hauptverzeichnis
 ```
+
+## Als systemd-User-Dienst
+
+Die Unit `~/.config/systemd/user/freistaat-bot.service` liegt fertig auf dem
+System (nicht enabled) und startet `node` direkt, damit `SIGTERM` ankommt und
+der Bot den Discord-Client sauber schließt:
+
+```bash
+systemctl --user daemon-reload
+systemctl --user enable --now freistaat-bot
+journalctl --user -u freistaat-bot -f
+```
+
+Node stammt über mise, daher `ExecStart=/usr/bin/mise x node@26 -- node src/index.js`.
+Bei einer anderen Node-Installation den Pfad entsprechend anpassen.

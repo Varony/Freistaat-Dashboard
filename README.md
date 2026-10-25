@@ -261,28 +261,25 @@ Alle Werte stehen in `bot/.env` (siehe `bot/.env.example`).
 
 ### Als systemd-User-Dienst
 
-```ini
-# ~/.config/systemd/user/freistaat-bot.service
-[Unit]
-Description=Freistaat Discord Bot
-
-[Service]
-WorkingDirectory=%h/Documents/GitHub/Freistaat-Dashboard/bot
-ExecStart=/usr/bin/npm start
-Restart=on-failure
-RestartSec=5
-
-[Install]
-WantedBy=default.target
-```
-
-Passe `ExecStart` an deine Node-Installation an (bei mise z. B.
-`%h/.local/share/mise/shims/npm`).
+Fertige Unit: `~/.config/systemd/user/freistaat-bot.service` (nicht enabled).
+Sie startet `node` direkt statt über `npm`, damit `SIGTERM` den Bot erreicht
+und er den Discord-Client sauber schließt. Weil Node über **mise** installiert
+ist, läuft `ExecStart` über `mise x node@26`; ohne mise genügt der absolute
+Pfad zur Node-Binary, z. B. `/usr/bin/node src/index.js`.
 
 ```bash
 systemctl --user daemon-reload
 systemctl --user enable --now freistaat-bot
 journalctl --user -u freistaat-bot -f
+```
+
+Voraussetzungen: `bot/.env` mit `DISCORD_TOKEN` liegt vor und
+`node bot/src/index.js` startet im Terminal ohne Fehler.
+
+```bash
+systemctl --user status freistaat-bot    # Zustand prüfen
+systemctl --user restart freistaat-bot   # nach Code-Änderungen
+systemctl --user disable --now freistaat-bot
 ```
 
 ## Nächste Schritte

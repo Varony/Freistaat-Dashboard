@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { DiscordLink } from "@/components/discord-link";
 import { buttonClasses, Container } from "@/components/ui";
+import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { siteConfig } from "@/lib/site-config";
 
 export function SiteFooter() {
@@ -15,8 +16,9 @@ export function SiteFooter() {
             {siteConfig.description}
           </p>
           <p className="mt-4 text-xs text-faint">
-            Prototyp mit Beispieldaten. Es werden noch keine echten Stimmen
-            gespeichert.
+            {isSupabaseConfigured()
+              ? "Stimmen und Unterschriften werden serverseitig bei Supabase gespeichert."
+              : "Prototyp mit Beispieldaten. Es werden noch keine echten Stimmen gespeichert."}
           </p>
           <DiscordLink
             label="Discord-Server"

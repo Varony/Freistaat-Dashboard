@@ -14,6 +14,7 @@ import {
 } from "@/components/ui";
 import { formatDate } from "@/lib/format";
 import { getLaws } from "@/lib/laws";
+import { isSupabaseConfigured } from "@/lib/supabase/config";
 import {
   getCitizenCount,
   getElections,
@@ -250,7 +251,9 @@ export default async function HomePage() {
         </section>
 
         <p className="mt-12 text-center text-xs text-faint">
-          Prototyp mit Beispieldaten · Stand {formatDate(new Date().toISOString())}
+          {isSupabaseConfigured() ? "Daten aus Supabase" : "Prototyp mit Beispieldaten"}
+          {" · Stand "}
+          {formatDate(new Date().toISOString())}
         </p>
       </Container>
     </>

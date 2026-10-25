@@ -483,16 +483,18 @@ export default async function ElectionPage({
           <Card className="p-5">
             <p className="text-sm font-medium text-text">Wer darf wählen?</p>
             <p className="mt-2 text-xs leading-relaxed text-muted">
-              Alle Bürger mit der Discord-Rolle „Bürger“, die vor Beginn der Wahl
-              beigetreten sind. Das Wählerverzeichnis wird beim Öffnen eingefroren.
+              {configured
+                ? "Alle angemeldeten Konten mit der Rolle „Bürger“ in Supabase. Eine Prüfung der Discord-Rolle ist noch nicht eingebaut."
+                : "Alle Bürger mit der Discord-Rolle „Bürger“, die vor Beginn der Wahl beigetreten sind. Das Wählerverzeichnis wird beim Öffnen eingefroren."}
             </p>
           </Card>
 
           <Card className="border-dashed bg-surface/40 p-5">
             <p className="text-sm font-medium text-text">Prototyp</p>
             <p className="mt-2 text-xs leading-relaxed text-muted">
-              Diese Seite nutzt Beispieldaten. Eine abgegebene Stimme wird nur
-              lokal im Browser gespeichert.
+              {configured
+                ? "Die Wahldaten kommen aus Supabase. Stimmen werden serverseitig gespeichert; eine Stimme pro Bürger."
+                : "Diese Seite nutzt Beispieldaten. Eine abgegebene Stimme wird nur lokal im Browser gespeichert."}
             </p>
           </Card>
         </aside>

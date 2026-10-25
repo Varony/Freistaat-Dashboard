@@ -306,7 +306,9 @@ export default async function InitiativePage({
           <Card className="border-dashed bg-surface/40 p-5">
             <p className="text-sm font-medium text-text">Prototyp</p>
             <p className="mt-2 text-xs leading-relaxed text-muted">
-              Unterschriften werden nur lokal im Browser simuliert.
+              {configured
+                ? "Die Unterschriften werden serverseitig gespeichert. Eine Unterschrift pro Bürger."
+                : "Unterschriften werden nur lokal im Browser simuliert."}
             </p>
           </Card>
         </aside>

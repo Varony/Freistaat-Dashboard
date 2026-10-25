@@ -34,8 +34,8 @@ Stand: 25.10.2026
 - [x] CI-Workflow für Lint, Tests und Build (Website und Bot)
 - [x] `npm audit`: 0 Schwachstellen – der alte Eintrag mit 5 hohen war veraltet
 - [x] Impressum: Struktur nach § 5 DDG mit deutlich markierten Platzhaltern
-- [x] Datenschutz: Erklärung für den aktuellen Prototyp (Hosting,
-      `localStorage`, Discord-Links)
+- [x] Datenschutz: Erklärung für Hosting, Discord-Login, Stimmen,
+      Unterschriften und lokale Demo-Daten
 
 ### Website & Deployment
 
@@ -94,19 +94,46 @@ Stand: 25.10.2026
 ## Offen – Website
 
 - [ ] Impressum: echte Angaben (Name, Anschrift und Kontakt) einsetzen
-- [ ] Datenschutz: rechtlich prüfen, Auftragsverarbeitungsvertrag mit Vercel
-      abschließen und die Erklärung vor Discord-Login/Supabase erweitern
+- [ ] Datenschutz: rechtlich prüfen, Auftragsverarbeitungsverträge mit Vercel
+      und Supabase abschließen und die Datenbankregion ergänzen
 - [ ] Optional: `NEXT_PUBLIC_SITE_URL` in Vercel setzen, falls die Domain
       wechselt (Fallback ist die aktuelle Vercel-Domain)
 
-## Echte Abstimmungen (Supabase)
+## Supabase
 
-- [ ] Supabase-Projekt anlegen
-- [ ] Discord OAuth in Supabase konfigurieren
-- [ ] Tabellen für Wahlen, Kandidaten, Stimmen und Bürgerbegehren anlegen
-- [ ] Next.js-Session/Login einbauen
-- [ ] `components/vote-form.tsx` von `localStorage` auf Server Actions umstellen
-- [ ] `components/initiative-sign.tsx` serverseitig speichern
-- [ ] Ergebnisse und Fristen serverseitig auswerten
-- [ ] Row Level Security: eine Stimme pro User und Wahl
-- [ ] Bot postet Links zu offenen Abstimmungen (optional)
+### Erledigt (Code)
+
+- [x] Schema, RLS, Trigger und Seed in
+      `supabase/migrations/20261025000000_init.sql`
+- [x] Tabellen für Parteien, Personen, Wahlen, Kandidaturen, Bürgerbegehren,
+      Profile, Stimmen und veröffentlichte Ergebnisse
+- [x] `lib/data.ts` liest Supabase und fällt ohne Konfiguration auf
+      `lib/mock-data.ts` zurück
+- [x] Discord-OAuth-Flow: `signInWithDiscord`, `/auth/callback` und
+      Session-Refresh über `proxy.ts`
+- [x] Profilseite mit Login, Logout, Stimmen und Unterschriften
+- [x] `components/vote-form.tsx` speichert Stimmen per Server Action;
+      eine Stimme pro Wahl, Trigger prüft Frist und Option
+- [x] `components/initiative-sign.tsx` speichert Unterschriften per Server
+      Action; Trigger prüft Frist und Schwelle
+- [x] Ergebnisse: `published_results` plus admin-geschütztes
+      `publish_election(...)`
+- [x] RLS: öffentliche Inhalte lesbar, Profile/Stimmen/Unterschriften nur
+      eigene, Schreiben nur für angemeldete Bürger
+- [x] Migration gegen echtes Postgres getestet (19/19 Checks: RLS, eine
+      Stimme, Fristen, Unterschriften, Admin-Publish)
+
+### Offen (manuell)
+
+- [ ] Cloud-Projekt: Migration im Supabase SQL Editor ausführen
+- [ ] Discord als Provider aktivieren (Client-ID/Secret und Redirect-URL)
+- [ ] `NEXT_PUBLIC_SUPABASE_URL` und `NEXT_PUBLIC_SUPABASE_ANON_KEY` in Vercel
+      setzen und neu deployen
+- [ ] Login, Stimme und Unterschrift im Livebetrieb testen
+- [ ] Wahlleitung: eigenes Profil auf `role = 'admin'` setzen
+- [ ] Discord-Rollenprüfung für „Bürger“ (aktuell darf jedes angemeldete Konto
+      wählen)
+- [ ] Admin-Oberfläche für Fristen, Kandidaturen und Ergebnisveröffentlichung
+      (aktuell SQL/Table Editor)
+- [ ] Optional: Bot postet Links zu offenen Abstimmungen
+

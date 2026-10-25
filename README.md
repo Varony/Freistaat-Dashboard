@@ -9,12 +9,13 @@ Das Repository enthält zwei Teile:
 - **Discord-Bot** (`bot/`) – verbindet Discord mit OpenCode und wird für die
   Arbeit an diesem Projekt aus Discord heraus genutzt.
 
-Aktueller Stand der Website: **klickbarer Prototyp mit Beispieldaten**. Das
-Gesetzblatt wird bereits automatisch aus Discord synchronisiert. Anmeldung und
-echte Stimmabgabe fehlen noch; die übrigen Daten liegen in `lib/mock-data.ts`.
+Aktueller Stand der Website: **klickbarer Prototyp**. Das Gesetzblatt wird
+automatisch aus Discord synchronisiert. Mit konfiguriertem Supabase gibt es
+Discord-Login, serverseitige Stimmen und Unterschriften mit RLS; ohne
+Konfiguration bleiben Inhalte und Abstimmungen Mock bzw. lokal im Browser.
 Status und Fristen werden aus den Daten abgeleitet. Kandidatur,
-Parteigründung und Bürgerbegehren-Einreichung sind als Demo gekennzeichnet –
-der tatsächliche Weg führt über den Discord-Server.
+Parteigründung und Bürgerbegehren-Einreichung sind Demo – der tatsächliche Weg
+führt über den Discord-Server.
 
 ## Entwicklung
 
@@ -44,6 +45,27 @@ npm run test:bot               # Bot-Tests
 ```
 
 Details: [Discord-Bot](#discord-bot) unten.
+
+## Supabase
+
+Die Website nutzt Supabase für Discord-Login, Stimmen und Unterschriften. Ohne
+`NEXT_PUBLIC_SUPABASE_URL` und `NEXT_PUBLIC_SUPABASE_ANON_KEY` läuft sie mit
+Mock-Daten weiter; der anon key ist öffentlich, der service_role key wird
+nicht benötigt.
+
+```bash
+cp .env.example .env.local
+# NEXT_PUBLIC_SUPABASE_URL und NEXT_PUBLIC_SUPABASE_ANON_KEY eintragen
+```
+
+1. `supabase/migrations/20261025000000_init.sql` im Supabase SQL Editor
+   ausführen (Schema, RLS, Trigger und Seed).
+2. Discord als Auth-Provider aktivieren und die Redirect-URLs in Supabase und
+   im Discord Developer Portal eintragen.
+3. Die Variablen in Vercel setzen und neu deployen.
+
+Die vollständige Anleitung inklusive Admin-Rechten und Ergebnis-
+Veröffentlichung steht in [`supabase/README.md`](supabase/README.md).
 
 ## Discord-Sync
 
@@ -110,15 +132,24 @@ npm run sync:discord
 
 ```
 app/                 Seiten (Next.js App Router)
+  auth/callback/     Supabase-OAuth-Callback
+  profil/            Profil, Login und Stimmnachweise
 components/          Layout- und UI-Komponenten
   ui.tsx             Card, Badge, Button, Progress, Avatar, Stat …
-  vote-form.tsx      Stimmabgabe (Demo, localStorage)
-  initiative-sign.tsx Unterschrift (Demo, localStorage)
+  vote-form.tsx      Stimmabgabe über Supabase, Demo-Fallback localStorage
+  initiative-sign.tsx Unterschrift über Supabase, Demo-Fallback
 lib/
-  site-config.ts     Name, Navigation, Discord-Link
+  data.ts            Supabase-Abfragen mit Fallback auf mock-data.ts
   mock-data.ts       Beispieldaten: Wahlen, Begehren, Parteien, Gesetze
+  status.ts          Status aus Fristen und results_public ableiten
   laws.ts            liest content/*.md, Fallback auf Beispieldaten
+  site-config.ts     Name, Navigation, Discord-Link
+  supabase/          Clients, Session-Proxy, Konfiguration
   types.ts           Datentypen
+supabase/
+  migrations/…sql    Schema, RLS, Trigger und Seed
+  README.md          Einrichtung, Discord-OAuth, Admin und Publish
+proxy.ts             Supabase-Session-Refresh (Next 16 Proxy)
 content/
   Verfassung des Freistaates.md   aus #verfassung generiert
   Recht und Ordnung.md            aus #recht-und-ordnung generiert
@@ -287,7 +318,9 @@ systemctl --user disable --now freistaat-bot
 
 ## Nächste Schritte
 
-- Echte Stimmabgabe mit Discord-Login und Supabase
-- Ergebnisse und Fristen serverseitig auswerten
+- Wahlleitung: Oberfläche für Fristen, Kandidaturen und Ergebnis-
+  Veröffentlichung (aktuell per SQL und Table Editor)
+- Discord-Rollenprüfung für die Rolle „Bürger“ (aktuell darf jedes angemeldete
+  Konto wählen)
 - Bot um Befehle für Abstimmungen und Gesetzes-Überprüfung erweitern
 

@@ -92,13 +92,24 @@ testen, nie ungetestet auf Produktion.
   lädt `@tailwindcss/turbopack`. Design-Tokens stehen in `app/globals.css`
   (`:root` + `@theme inline`); Klassen wie `bg-bg`, `text-muted`,
   `border-border`, `rounded-card` hängen daran.
-- Kein Backend, keine Auth: Wahlen, Parteien und Begehren sind Mock-Daten aus
-  `lib/mock-data.ts`; Stimmen und Unterschriften liegen nur im `localStorage`
-  (`lib/use-local-storage.ts`).
-- Status und Fristen kommen aus `lib/status.ts`, nicht aus dem `status`-Feld
-  der Mock-Daten. Seiten mit Fristen setzen `revalidate = 300`.
+- Supabase ist optional. Ohne `NEXT_PUBLIC_SUPABASE_URL` und
+  `NEXT_PUBLIC_SUPABASE_ANON_KEY` kommen die Inhalte aus `lib/mock-data.ts`
+  und Stimmen/Unterschriften bleiben im `localStorage`. Mit Konfiguration
+  liest `lib/data.ts` aus Supabase; Auth und Schreibzugriffe laufen über
+  `lib/supabase/` und Server Actions.
+- Schema, RLS, Trigger und Seed stehen in
+  `supabase/migrations/20261025000000_init.sql`; die Einrichtung inklusive
+  Discord-OAuth steht in `supabase/README.md`. Niemals den service_role key
+  verwenden oder als `NEXT_PUBLIC_*` setzen.
+- Status und Fristen kommen aus `lib/status.ts`, nicht aus einem
+  gespeicherten Statusfeld. `results_public` entscheidet über
+  „veröffentlicht“. Übersichtsseiten nutzen ISR (`revalidate = 300`),
+  Wahl-/Begehren-Details und `/profil` sind dynamisch.
+- `proxy.ts` (Next 16, nicht `middleware.ts`) erneuert die Session. Server
+  Actions prüfen Auth und Rechte trotzdem selbst.
 - Kandidatur, Parteigründung und Begehren-Einreichung sind bewusst Demo und
-  müssen so gekennzeichnet bleiben, bis Supabase angebunden ist.
+  müssen so gekennzeichnet bleiben. Supabase deckt Login, Stimmen und
+  Unterschriften ab, nicht diese Anträge.
 - Kanonische URL: `NEXT_PUBLIC_SITE_URL`, Fallback ist die Vercel-Domain
   (`lib/site-config.ts`).
 - Oberfläche ist deutsch; neue Texte ebenfalls.

@@ -5,7 +5,7 @@
   "description": "Discord-Bot, der Nachrichten an eine lokale OpenCode-Instanz weiterleitet",
   "type": "module",
   "engines": {
-    "node": ">=20.9.0"
+    "node": ">=20.12.0"
   },
   "scripts": {
     "start": "node src/index.js",

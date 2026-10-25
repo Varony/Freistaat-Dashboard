@@ -176,7 +176,7 @@ zum Projekt stellen.
 
 ### Voraussetzungen
 
-- Node.js **20.9 oder neuer**
+- Node.js **20.12 oder neuer**
 - OpenCode **V2** installiert und eingerichtet (`opencode --version`)
 - Ein Discord-Bot-Account im
   [Developer Portal](https://discord.com/developers/applications)

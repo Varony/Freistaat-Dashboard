@@ -1,23 +1,48 @@
 "use client";
 
+import Link from "next/link";
+import { useActionState } from "react";
+import {
+  signInitiative,
+  type InitiativeState,
+} from "@/app/buergerbegehren/[slug]/actions";
 import { IconCheck } from "@/components/icons";
-import { buttonClasses, Progress } from "@/components/ui";
+import { buttonClasses, Card, Progress } from "@/components/ui";
 import { percent } from "@/lib/format";
 import { setStoredValue, useStoredValue } from "@/lib/use-local-storage";
+
+const initialState: InitiativeState = { status: "idle" };
 
 export function InitiativeSign({
   slug,
   initialSignatures,
   threshold,
+  mode,
+  isAuthenticated,
+  initialSigned,
 }: {
   slug: string;
   initialSignatures: number;
   threshold: number;
+  mode: "live" | "demo";
+  isAuthenticated: boolean;
+  initialSigned: boolean;
 }) {
   const storageKey = `freistaat:signature:${slug}`;
   const stored = useStoredValue(storageKey);
-  const signed = stored === "1";
-  const signatures = initialSignatures + (signed ? 1 : 0);
+  const [state, formAction, pending] = useActionState(
+    signInitiative,
+    initialState,
+  );
+
+  const demoSigned = stored === "1";
+  const signed = mode === "demo" ? demoSigned : initialSigned || state.status === "success";
+  const liveJustSigned = mode === "live" && state.status === "success" && !initialSigned;
+  const signatures =
+    mode === "demo"
+      ? initialSignatures + (demoSigned ? 1 : 0)
+      : initialSignatures + (liveJustSigned ? 1 : 0);
+  const progress = percent(signatures, threshold);
 
   function sign() {
     setStoredValue(storageKey, "1");
@@ -27,7 +52,25 @@ export function InitiativeSign({
     setStoredValue(storageKey, null);
   }
 
-  const progress = percent(signatures, threshold);
+  if (mode === "live" && !isAuthenticated && !signed) {
+    return (
+      <Card className="border-dashed bg-surface/40 p-6">
+        <p className="text-sm font-semibold text-text">
+          Anmeldung erforderlich
+        </p>
+        <p className="mt-1 text-sm leading-relaxed text-muted">
+          Unterschriften werden serverseitig gespeichert. Melde dich mit Discord
+          an, um dieses Bürgerbegehren zu unterstützen.
+        </p>
+        <Link
+          href="/profil"
+          className={buttonClasses("secondary", "sm", "mt-4")}
+        >
+          Mit Discord anmelden
+        </Link>
+      </Card>
+    );
+  }
 
   return (
     <div>
@@ -56,27 +99,45 @@ export function InitiativeSign({
               <IconCheck className="h-3.5 w-3.5" />
               Unterschrieben
             </span>
-            <button
-              type="button"
-              onClick={reset}
-              className="text-xs text-faint underline underline-offset-4 transition-colors hover:text-text"
-            >
-              Zurücksetzen (Demo)
-            </button>
+            {mode === "demo" ? (
+              <button
+                type="button"
+                onClick={reset}
+                className="text-xs text-faint underline underline-offset-4 transition-colors hover:text-text"
+              >
+                Zurücksetzen (Demo)
+              </button>
+            ) : null}
           </div>
         ) : (
-          <button
-            type="button"
-            onClick={sign}
-            className={buttonClasses("primary", "md", "w-full sm:w-auto")}
-          >
-            Jetzt unterschreiben
-          </button>
+          <form action={mode === "live" ? formAction : undefined}>
+            {mode === "live" ? (
+              <input type="hidden" name="initiative" value={slug} />
+            ) : null}
+            <button
+              type={mode === "live" ? "submit" : "button"}
+              onClick={mode === "demo" ? sign : undefined}
+              disabled={mode === "live" && pending}
+              className={buttonClasses("primary", "md", "w-full sm:w-auto")}
+            >
+              {mode === "live" && pending
+                ? "Wird gespeichert …"
+                : "Jetzt unterschreiben"}
+            </button>
+          </form>
         )}
       </div>
 
+      {mode === "live" && state.status === "error" ? (
+        <p className="mt-3 text-xs leading-relaxed text-danger" role="alert">
+          {state.message}
+        </p>
+      ) : null}
+
       <p className="mt-3 text-xs leading-relaxed text-faint">
-        Demo: Die Unterschrift wird nur lokal in diesem Browser gespeichert.
+        {mode === "live"
+          ? "Die Unterschrift wird serverseitig gespeichert. Eine Unterschrift pro Bürger."
+          : "Demo: Die Unterschrift wird nur lokal in diesem Browser gespeichert."}
       </p>
     </div>
   );

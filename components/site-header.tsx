@@ -31,7 +31,7 @@ export function SiteHeader() {
             className={buttonClasses("secondary", "sm")}
           />
           <Link href="/profil" className={buttonClasses("ghost", "sm")}>
-            Anmelden
+            Profil
           </Link>
         </div>
 

@@ -9,7 +9,7 @@ import {
   Container,
   SectionHeading,
 } from "@/components/ui";
-import { getInitiatives } from "@/lib/mock-data";
+import { getInitiatives } from "@/lib/data";
 import type { Initiative, InitiativeStatus } from "@/lib/types";
 
 export const revalidate = 300;
@@ -49,8 +49,8 @@ const groups: Array<{
   },
 ];
 
-export default function InitiativesPage() {
-  const initiativeList = getInitiatives();
+export default async function InitiativesPage() {
+  const initiativeList = await getInitiatives();
 
   return (
     <>

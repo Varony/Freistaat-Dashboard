@@ -3,14 +3,18 @@ import { PartyCard } from "@/components/party-card";
 import { DemoNotice } from "@/components/demo-notice";
 import { DiscordLink } from "@/components/discord-link";
 import { Badge, buttonClasses, Container } from "@/components/ui";
-import { parties } from "@/lib/mock-data";
+import { getParties } from "@/lib/data";
+
+export const revalidate = 300;
 
 export const metadata: Metadata = {
   title: "Parteien",
   description: "Parteien, Programme und Vorsitz im Freistaat.",
 };
 
-export default function PartiesPage() {
+export default async function PartiesPage() {
+  const partyList = await getParties();
+
   return (
     <>
       <section className="border-b border-border">
@@ -28,7 +32,7 @@ export default function PartiesPage() {
 
       <Container className="py-10 sm:py-14">
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {parties.map((party) => (
+          {partyList.map((party) => (
             <PartyCard key={party.id} party={party} />
           ))}
         </div>

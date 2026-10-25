@@ -9,7 +9,7 @@ import {
   Container,
   SectionHeading,
 } from "@/components/ui";
-import { getElections } from "@/lib/mock-data";
+import { getElections, getParties } from "@/lib/data";
 import type { Election, ElectionStatus } from "@/lib/types";
 
 export const revalidate = 300;
@@ -45,8 +45,11 @@ const groups: Array<{
   },
 ];
 
-export default function ElectionsPage() {
-  const electionList = getElections();
+export default async function ElectionsPage() {
+  const [electionList, partyList] = await Promise.all([
+    getElections(),
+    getParties(),
+  ]);
 
   return (
     <>
@@ -81,7 +84,11 @@ export default function ElectionsPage() {
                 />
                 <div className="mt-6 grid gap-3 md:grid-cols-2">
                   {items.map((election) => (
-                    <ElectionCard key={election.id} election={election} />
+                    <ElectionCard
+                      key={election.id}
+                      election={election}
+                      parties={partyList}
+                    />
                   ))}
                 </div>
               </section>

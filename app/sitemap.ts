@@ -1,8 +1,13 @@
 import type { MetadataRoute } from "next";
-import { elections, initiatives, parties } from "@/lib/mock-data";
+import { getElections, getInitiatives, getParties } from "@/lib/data";
 import { siteConfig } from "@/lib/site-config";
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const [electionList, initiativeList, partyList] = await Promise.all([
+    getElections(),
+    getInitiatives(),
+    getParties(),
+  ]);
   const base = siteConfig.url;
   const lastModified = new Date();
 
@@ -55,19 +60,19 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "yearly",
       priority: 0.2,
     },
-    ...elections.map((election) => ({
+    ...electionList.map((election) => ({
       url: `${base}/wahlen/${election.slug}`,
       lastModified,
       changeFrequency: "weekly" as const,
       priority: 0.8,
     })),
-    ...initiatives.map((initiative) => ({
+    ...initiativeList.map((initiative) => ({
       url: `${base}/buergerbegehren/${initiative.slug}`,
       lastModified,
       changeFrequency: "weekly" as const,
       priority: 0.7,
     })),
-    ...parties.map((party) => ({
+    ...partyList.map((party) => ({
       url: `${base}/parteien/${party.id}`,
       lastModified,
       changeFrequency: "monthly" as const,

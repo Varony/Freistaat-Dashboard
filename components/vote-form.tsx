@@ -1,6 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import Link from "next/link";
+import { useActionState, useState } from "react";
+import { castVote, type VoteState } from "@/app/wahlen/[slug]/actions";
 import { IconCheck } from "@/components/icons";
 import { buttonClasses, Card } from "@/components/ui";
 import { setStoredValue, useStoredValue } from "@/lib/use-local-storage";
@@ -14,25 +16,40 @@ export type VoteOption = {
   color?: string;
 };
 
+const initialState: VoteState = { status: "idle" };
+
 export function VoteForm({
   electionSlug,
   options,
   legend,
+  mode,
+  isAuthenticated,
+  initialVote,
 }: {
   electionSlug: string;
   options: VoteOption[];
   legend: string;
+  mode: "live" | "demo";
+  isAuthenticated: boolean;
+  initialVote?: string | null;
 }) {
   const storageKey = `freistaat:vote:${electionSlug}`;
   const [selected, setSelected] = useState<string | null>(null);
   const stored = useStoredValue(storageKey);
-  const voted =
+  const [state, formAction, pending] = useActionState(castVote, initialState);
+
+  const demoVote =
     stored && options.some((option) => option.id === stored) ? stored : null;
+  const liveVote =
+    initialVote ??
+    (state.status === "success" ? (state.optionId ?? null) : null);
+  const voted = mode === "demo" ? demoVote : liveVote;
+  const votedOption = options.find((option) => option.id === voted);
 
   function submit(event: React.FormEvent<HTMLFormElement>) {
+    if (mode === "live") return;
     event.preventDefault();
-    if (!selected) return;
-    setStoredValue(storageKey, selected);
+    if (selected) setStoredValue(storageKey, selected);
   }
 
   function reset() {
@@ -40,7 +57,25 @@ export function VoteForm({
     setSelected(null);
   }
 
-  const votedOption = options.find((option) => option.id === voted);
+  if (mode === "live" && !isAuthenticated && !votedOption) {
+    return (
+      <Card className="border-dashed bg-surface/40 p-6">
+        <p className="text-sm font-semibold text-text">
+          Anmeldung erforderlich
+        </p>
+        <p className="mt-1 text-sm leading-relaxed text-muted">
+          Abstimmungen werden serverseitig gespeichert. Melde dich mit Discord
+          an, um an dieser Wahl teilzunehmen.
+        </p>
+        <Link
+          href="/profil"
+          className={buttonClasses("secondary", "sm", "mt-4")}
+        >
+          Mit Discord anmelden
+        </Link>
+      </Card>
+    );
+  }
 
   if (votedOption) {
     return (
@@ -55,16 +90,19 @@ export function VoteForm({
               Deine Auswahl: <span className="text-text">{votedOption.label}</span>
             </p>
             <p className="mt-2 text-xs leading-relaxed text-faint">
-              Demo: Die Stimme wird nur lokal in diesem Browser gespeichert und
-              nicht an den Freistaat übertragen.
+              {mode === "live"
+                ? "Die Stimme ist serverseitig gespeichert. Eine Stimme pro Wahl; Änderungen sind nicht möglich."
+                : "Demo: Die Stimme wird nur lokal in diesem Browser gespeichert und nicht an den Freistaat übertragen."}
             </p>
-            <button
-              type="button"
-              onClick={reset}
-              className="mt-4 text-xs font-medium text-muted underline underline-offset-4 transition-colors hover:text-text"
-            >
-              Auswahl zurücksetzen
-            </button>
+            {mode === "demo" ? (
+              <button
+                type="button"
+                onClick={reset}
+                className="mt-4 text-xs font-medium text-muted underline underline-offset-4 transition-colors hover:text-text"
+              >
+                Auswahl zurücksetzen
+              </button>
+            ) : null}
           </div>
         </div>
       </Card>
@@ -72,7 +110,7 @@ export function VoteForm({
   }
 
   return (
-    <form onSubmit={submit}>
+    <form action={mode === "live" ? formAction : undefined} onSubmit={submit}>
       <fieldset>
         <legend className="mb-3 text-sm font-medium text-text">{legend}</legend>
         <div className="space-y-2">
@@ -91,11 +129,12 @@ export function VoteForm({
               >
                 <input
                   type="radio"
-                  name="vote"
+                  name="option"
                   value={option.id}
                   checked={active}
                   onChange={() => setSelected(option.id)}
                   className="sr-only"
+                  required={mode === "live"}
                 />
                 <span
                   className={cn(
@@ -140,18 +179,30 @@ export function VoteForm({
         </div>
       </fieldset>
 
+      {mode === "live" ? (
+        <input type="hidden" name="election" value={electionSlug} />
+      ) : null}
+
       <div className="mt-4 flex flex-wrap items-center gap-3">
         <button
           type="submit"
-          disabled={!selected}
+          disabled={!selected || (mode === "live" && pending)}
           className={buttonClasses("primary", "md")}
         >
-          Stimme abgeben
+          {mode === "live" && pending ? "Wird gespeichert …" : "Stimme abgeben"}
         </button>
         <p className="text-xs text-faint">
-          Demo – es wird keine echte Stimme gespeichert.
+          {mode === "live"
+            ? "Eine Stimme pro Wahl. Die Auswahl wird serverseitig gespeichert."
+            : "Demo – es wird keine echte Stimme gespeichert."}
         </p>
       </div>
+
+      {mode === "live" && state.status === "error" ? (
+        <p className="mt-3 text-xs leading-relaxed text-danger" role="alert">
+          {state.message}
+        </p>
+      ) : null}
     </form>
   );
 }

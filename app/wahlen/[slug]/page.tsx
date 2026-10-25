@@ -19,16 +19,14 @@ import {
 } from "@/components/ui";
 import { VoteForm, type VoteOption } from "@/components/vote-form";
 import { DiscordLink } from "@/components/discord-link";
+import { getElection, getParties } from "@/lib/data";
 import { deadlineLabel, formatDate, percent } from "@/lib/format";
 import { electionStatusMeta } from "@/lib/labels";
-import { elections, getElection, getParty } from "@/lib/mock-data";
+import { isSupabaseConfigured } from "@/lib/supabase/config";
+import { getSupabaseServerClient } from "@/lib/supabase/server";
 import { cn } from "@/lib/utils";
 
-export const revalidate = 300;
-
-export function generateStaticParams() {
-  return elections.map((election) => ({ slug: election.slug }));
-}
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata({
   params,
@@ -36,8 +34,18 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const election = getElection(slug);
-  return { title: election?.title ?? "Wahl" };
+  const election = await getElection(slug);
+
+  if (!election) return { title: "Wahl" };
+
+  return {
+    title: election.title,
+    description: election.description,
+    openGraph: {
+      title: election.title,
+      description: election.description,
+    },
+  };
 }
 
 export default async function ElectionPage({
@@ -46,9 +54,36 @@ export default async function ElectionPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const election = getElection(slug);
+  const [election, partyList] = await Promise.all([
+    getElection(slug),
+    getParties(),
+  ]);
 
   if (!election) notFound();
+
+  const partyById = new Map(partyList.map((party) => [party.id, party]));
+  const configured = isSupabaseConfigured();
+  let authenticated = false;
+  let existingVote: string | null = null;
+
+  if (configured) {
+    const supabase = await getSupabaseServerClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    authenticated = Boolean(user);
+
+    if (user) {
+      const { data: vote } = await supabase
+        .from("votes")
+        .select("option_id")
+        .eq("election_id", election.id)
+        .eq("user_id", user.id)
+        .maybeSingle();
+
+      existingVote = vote?.option_id ?? null;
+    }
+  }
 
   const status = electionStatusMeta[election.status];
   const isOpen = election.status === "open";
@@ -59,7 +94,7 @@ export default async function ElectionPage({
   const voteOptions: VoteOption[] =
     election.type === "rat"
       ? (election.parties ?? []).map((partyId) => {
-          const party = getParty(partyId);
+          const party = partyById.get(partyId);
           const list = election.candidates
             .filter((candidate) => candidate.partyId === partyId)
             .sort((a, b) => (a.listPosition ?? 0) - (b.listPosition ?? 0));
@@ -74,7 +109,7 @@ export default async function ElectionPage({
           };
         })
       : election.candidates.map((candidate) => {
-          const party = getParty(candidate.partyId);
+          const party = partyById.get(candidate.partyId ?? "");
           return {
             id: candidate.id,
             label: candidate.name,
@@ -235,7 +270,7 @@ export default async function ElectionPage({
             {election.type === "rat" ? (
               <div className="mt-5 space-y-3">
                 {(election.parties ?? []).map((partyId) => {
-                  const party = getParty(partyId);
+                  const party = partyById.get(partyId);
                   const list = election.candidates
                     .filter((candidate) => candidate.partyId === partyId)
                     .sort((a, b) => (a.listPosition ?? 0) - (b.listPosition ?? 0));
@@ -280,7 +315,7 @@ export default async function ElectionPage({
             ) : (
               <div className="mt-5 space-y-2">
                 {election.candidates.map((candidate) => {
-                  const party = getParty(candidate.partyId);
+                  const party = partyById.get(candidate.partyId ?? "");
 
                   return (
                     <div
@@ -336,7 +371,9 @@ export default async function ElectionPage({
                         <div key={item.candidateId}>
                           <div className="flex items-end justify-between gap-3 text-sm">
                             <span className="font-medium text-text">
-                              {candidate?.name ?? item.candidateId}
+                              {candidate?.name ??
+                                partyById.get(item.candidateId)?.name ??
+                                item.candidateId}
                             </span>
                             <span className="text-xs text-faint">
                               {item.votes} Stimmen · {share}%
@@ -371,6 +408,9 @@ export default async function ElectionPage({
                 <VoteForm
                   electionSlug={election.slug}
                   options={voteOptions}
+                  mode={configured ? "live" : "demo"}
+                  isAuthenticated={authenticated}
+                  initialVote={existingVote}
                   legend={
                     election.type === "rat"
                       ? "Welche Liste soll den Rat bilden?"

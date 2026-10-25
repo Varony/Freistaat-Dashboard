@@ -37,7 +37,7 @@ export function MobileNav() {
             onClick={() => setOpen(false)}
             className={buttonClasses("secondary", "md", "mt-4 w-full")}
           >
-            Anmelden
+            Profil
           </Link>
           <DiscordLink
             label="Discord beitreten"

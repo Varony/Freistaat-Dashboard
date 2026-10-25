@@ -19,12 +19,13 @@ import {
 import { DiscordLink } from "@/components/discord-link";
 import { DemoNotice } from "@/components/demo-notice";
 import { electionStatusMeta } from "@/lib/labels";
-import { getElections, getParty, parties } from "@/lib/mock-data";
+import { getElections, getParties, getParty } from "@/lib/data";
 
 export const revalidate = 300;
 
-export function generateStaticParams() {
-  return parties.map((party) => ({ slug: party.id }));
+export async function generateStaticParams() {
+  const partyList = await getParties();
+  return partyList.map((party) => ({ slug: party.id }));
 }
 
 export async function generateMetadata({
@@ -33,7 +34,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const party = getParty(slug);
+  const party = await getParty(slug);
 
   if (!party) return { title: "Partei" };
 
@@ -53,11 +54,11 @@ export default async function PartyPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const party = getParty(slug);
+  const party = await getParty(slug);
 
   if (!party) notFound();
 
-  const electionList = getElections();
+  const electionList = await getElections();
   const candidacies = electionList.flatMap((election) =>
     election.candidates
       .filter((candidate) => candidate.partyId === party.id)

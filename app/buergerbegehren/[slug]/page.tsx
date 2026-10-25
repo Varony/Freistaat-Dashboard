@@ -19,18 +19,12 @@ import {
 } from "@/components/ui";
 import { formatDate, percent } from "@/lib/format";
 import { initiativeStatusMeta } from "@/lib/labels";
-import {
-  getElection,
-  getInitiative,
-  initiatives,
-} from "@/lib/mock-data";
+import { getElection, getInitiative } from "@/lib/data";
+import { isSupabaseConfigured } from "@/lib/supabase/config";
+import { getSupabaseServerClient } from "@/lib/supabase/server";
 import { cn } from "@/lib/utils";
 
-export const revalidate = 300;
-
-export function generateStaticParams() {
-  return initiatives.map((initiative) => ({ slug: initiative.slug }));
-}
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata({
   params,
@@ -38,8 +32,18 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const initiative = getInitiative(slug);
-  return { title: initiative?.title ?? "Bürgerbegehren" };
+  const initiative = await getInitiative(slug);
+
+  if (!initiative) return { title: "Bürgerbegehren" };
+
+  return {
+    title: initiative.title,
+    description: initiative.summary,
+    openGraph: {
+      title: initiative.title,
+      description: initiative.summary,
+    },
+  };
 }
 
 export default async function InitiativePage({
@@ -48,9 +52,32 @@ export default async function InitiativePage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const initiative = getInitiative(slug);
+  const initiative = await getInitiative(slug);
 
   if (!initiative) notFound();
+
+  const configured = isSupabaseConfigured();
+  let authenticated = false;
+  let signed = false;
+
+  if (configured) {
+    const supabase = await getSupabaseServerClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    authenticated = Boolean(user);
+
+    if (user) {
+      const { data } = await supabase
+        .from("initiative_signatures")
+        .select("initiative_id")
+        .eq("initiative_id", initiative.id)
+        .eq("user_id", user.id)
+        .maybeSingle();
+
+      signed = Boolean(data);
+    }
+  }
 
   const status = initiativeStatusMeta[initiative.status];
   const isCollecting = initiative.status === "collecting";
@@ -58,7 +85,7 @@ export default async function InitiativePage({
   const progress = percent(initiative.signatures, initiative.threshold);
 
   const referendum = initiative.referendumSlug
-    ? getElection(initiative.referendumSlug)
+    ? await getElection(initiative.referendumSlug)
     : undefined;
 
   return (
@@ -130,6 +157,9 @@ export default async function InitiativePage({
                     slug={initiative.slug}
                     initialSignatures={initiative.signatures}
                     threshold={initiative.threshold}
+                    mode={configured ? "live" : "demo"}
+                    isAuthenticated={authenticated}
+                    initialSigned={signed}
                   />
                 </div>
               </>

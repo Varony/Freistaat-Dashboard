@@ -15,18 +15,23 @@ import {
 import { formatDate } from "@/lib/format";
 import { getLaws } from "@/lib/laws";
 import {
+  getCitizenCount,
   getElections,
   getInitiatives,
-  parties,
-  statistics,
-} from "@/lib/mock-data";
+  getParties,
+} from "@/lib/data";
 
 export const revalidate = 300;
 
 export default async function HomePage() {
-  const laws = await getLaws();
-  const electionList = getElections();
-  const initiativeList = getInitiatives();
+  const [laws, electionList, initiativeList, partyList, citizens] =
+    await Promise.all([
+      getLaws(),
+      getElections(),
+      getInitiatives(),
+      getParties(),
+      getCitizenCount(),
+    ]);
 
   const runningElections = electionList.filter(
     (election) => election.status === "open" || election.status === "candidacy",
@@ -64,7 +69,7 @@ export default async function HomePage() {
             <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-2 text-xs text-faint">
               <span className="inline-flex items-center gap-2">
                 <IconUsers className="h-3.5 w-3.5" />
-                {statistics.citizens} Bürger
+                {citizens} Bürger
               </span>
               <span className="inline-flex items-center gap-2">
                 <IconVote className="h-3.5 w-3.5" />
@@ -81,7 +86,7 @@ export default async function HomePage() {
 
       <Container className="py-10 sm:py-14">
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          <Stat value={statistics.citizens} label="Bürger" hint="verifizierte Mitglieder" />
+          <Stat value={citizens} label="Bürger" hint="verifizierte Mitglieder" />
           <Stat
             value={runningElections.length}
             label="Laufende Verfahren"
@@ -112,7 +117,7 @@ export default async function HomePage() {
           />
           <div className="mt-6 grid gap-3 md:grid-cols-2">
             {runningElections.slice(0, 4).map((election) => (
-              <ElectionCard key={election.id} election={election} />
+              <ElectionCard key={election.id} election={election} parties={partyList} />
             ))}
           </div>
         </section>
@@ -238,7 +243,7 @@ export default async function HomePage() {
             }
           />
           <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {parties.map((party) => (
+            {partyList.map((party) => (
               <PartyCard key={party.id} party={party} />
             ))}
           </div>

@@ -3,11 +3,17 @@ import { IconArrowRight, IconUsers } from "@/components/icons";
 import { Avatar, Badge, Card } from "@/components/ui";
 import { electionDeadlineLabel } from "@/lib/format";
 import { electionStatusMeta } from "@/lib/labels";
-import { getParty } from "@/lib/mock-data";
-import type { Election } from "@/lib/types";
+import type { Election, Party } from "@/lib/types";
 
-export function ElectionCard({ election }: { election: Election }) {
+export function ElectionCard({
+  election,
+  parties,
+}: {
+  election: Election;
+  parties: Party[];
+}) {
   const status = electionStatusMeta[election.status];
+  const partyById = new Map(parties.map((party) => [party.id, party]));
   const meta =
     election.type === "rat"
       ? `${election.seats ?? 0} Sitze · ${election.parties?.length ?? 0} Listen`
@@ -44,7 +50,7 @@ export function ElectionCard({ election }: { election: Election }) {
         <div className="flex items-center gap-2">
           <div className="flex -space-x-2">
             {election.candidates.slice(0, 4).map((candidate) => {
-              const party = getParty(candidate.partyId);
+              const party = partyById.get(candidate.partyId ?? "");
               return (
                 <span
                   key={candidate.id}

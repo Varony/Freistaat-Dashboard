@@ -1,6 +1,6 @@
 # TODO
 
-Stand: 23.10.2026
+Stand: 25.10.2026
 
 > **Regel:** Neue Features und Workflow-Änderungen zuerst im Testserver
 > `freistaat test` testen, erst danach in `Freistaat` ausrollen.
@@ -15,9 +15,27 @@ Stand: 23.10.2026
 - [x] Eigene `package.json`/`package-lock.json` im Bot; Root-Skripte
       `bot:start`, `bot:dev`, `bot:doctor`, `test:bot`
 - [x] `bot/.env` (aus `bot/.env.example`), Root-`.env` bleibt nur für `scripts/`
-- [x] Bot-Engine auf `>=20.9.0` angeglichen (Abhängigkeiten verlangen nicht mehr)
+- [x] Bot-Engine auf Node `>=20.12.0` korrigiert (`process.loadEnvFile`)
 - [x] `.gitignore`, `README.md`, `AGENTS.md` auf die neue Struktur umgestellt
 - [x] Website-Build, Lint und beide Testsuiten nach dem Merge grün
+
+### Website-Ausbau (25.10.2026)
+
+- [x] Discord-Einladungslink `https://discord.gg/DDXsES9DG` zentral in
+      `siteConfig.discordUrl`; verlinkt in Header, Mobile-Menü und Footer
+- [x] SEO: `metadataBase`, OpenGraph/Twitter Cards, generiertes OG-Bild,
+      `app/sitemap.ts` und `app/robots.ts`
+- [x] `app/error.tsx` und `app/loading.tsx`
+- [x] Status und Fristen werden aus den Daten abgeleitet (`lib/status.ts`);
+      Seiten mit Fristen nutzen ISR (`revalidate = 300`)
+- [x] Parteien-Detailseiten (`/parteien/[slug]`) und klickbare Parteikarten
+- [x] Kandidatur, Parteigründung und Begehren-Einreichung klar als Demo
+      gekennzeichnet; der tatsächliche Weg führt über Discord
+- [x] CI-Workflow für Lint, Tests und Build (Website und Bot)
+- [x] `npm audit`: 0 Schwachstellen – der alte Eintrag mit 5 hohen war veraltet
+- [x] Impressum: Struktur nach § 5 DDG mit deutlich markierten Platzhaltern
+- [x] Datenschutz: Erklärung für den aktuellen Prototyp (Hosting,
+      `localStorage`, Discord-Links)
 
 ### Website & Deployment
 
@@ -25,8 +43,9 @@ Stand: 23.10.2026
   (vorher `STATIC_BUILD_NO_OUT_DIR`, weil `public/` gesucht wurde)
 - [x] Production-Deploy erfolgreich
 - [x] Website live unter https://freistaat-dashboard.vercel.app
-- [x] Alle Routen geprüft: Start, Wahlen, Begehren, Gesetze, Parteien,
-      Profil, Impressum, Datenschutz liefern 200; unbekannte Pfade 404
+- [x] Alle Routen geprüft: Start, Wahlen, Begehren, Gesetze, Parteien inkl.
+      Detailseiten, Profil, Impressum, Datenschutz, Sitemap, Robots und
+      OG-Bild liefern 200; unbekannte Pfade 404
 - [x] Vercel-Deploy nach dem letzten Gesetze-Sync geprüft – erfolgreich,
       Live-Seite zeigt die synchronisierten Texte
 
@@ -72,21 +91,13 @@ Stand: 23.10.2026
 - [ ] Entscheiden, ob der Bot die Sync-Skripte aus `scripts/` aufrufen soll
       statt eigener Logik
 
-## Offen – Website vervollständigen
+## Offen – Website
 
-- [ ] Discord-Einladungslink eintragen (`siteConfig.discordUrl` ist `"#"`) und
-      in Header/Footer verlinken
-- [ ] Impressum: echte Angaben statt Platzhalter
-- [ ] Datenschutz: vollständige Erklärung für den Livebetrieb
-- [ ] SEO: `metadataBase`, OpenGraph/Twitter Cards, `sitemap.ts`, `robots.ts`
-- [ ] `error.tsx` und `loading.tsx` ergänzen
-- [ ] Status und Fristen dynamisch aus den Daten ableiten
-      (Mock-Status veraltet sonst)
-- [ ] Parteien-Detailseiten und klickbare Parteikarten
-- [ ] Kandidatur, Parteigründung und Begehren-Einreichung: echte Flows oder
-      klar als Demo kennzeichnen
-- [ ] CI für Lint, Tests und Build einrichten
-- [ ] `npm audit` prüfen (aktuell 5 hohe Schwachstellen)
+- [ ] Impressum: echte Angaben (Name, Anschrift und Kontakt) einsetzen
+- [ ] Datenschutz: rechtlich prüfen, Auftragsverarbeitungsvertrag mit Vercel
+      abschließen und die Erklärung vor Discord-Login/Supabase erweitern
+- [ ] Optional: `NEXT_PUBLIC_SITE_URL` in Vercel setzen, falls die Domain
+      wechselt (Fallback ist die aktuelle Vercel-Domain)
 
 ## Echte Abstimmungen (Supabase)
 

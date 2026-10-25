@@ -1,0 +1,20 @@
+{
+  "name": "freistaat-bot",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Discord-Bot, der Nachrichten an eine lokale OpenCode-Instanz weiterleitet",
+  "type": "module",
+  "engines": {
+    "node": ">=20.9.0"
+  },
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js",
+    "doctor": "node src/doctor.js",
+    "test": "node --test test/"
+  },
+  "dependencies": {
+    "@opencode/client": "^2.1.3",
+    "discord.js": "^14.27.0"
+  }
+}

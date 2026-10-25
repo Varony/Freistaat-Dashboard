@@ -8,6 +8,10 @@ Neue Features, Workflow-Änderungen und Bot-Anpassungen werden **zuerst im
 Testserver** getestet. Niemals ungetestet direkt im Produktionsserver
 ausrollen.
 
+Auch für den Bot (Ordner `bot/`) gilt: Zuerst mit der Test-Guild-ID
+(`DISCORD_GUILD_ID=1561751762426273892` in `bot/.env`) prüfen, dann auf
+Produktion umstellen.
+
 | Umgebung | Server | Guild-ID |
 | --- | --- | --- |
 | Test | `freistaat test` | `1561751762426273892` |
@@ -38,6 +42,33 @@ Ablauf für Discord-/Sync-Änderungen:
 - `content/discord-channels.json` – Channel-Links für die Website
 - `.github/workflows/publish-laws.yml` – Markdown → Discord
 - `.github/workflows/sync-laws-from-discord.yml` – Discord → Markdown
+
+### Projektaufbau
+
+Ein Repository, zwei Anwendungen:
+
+| Ordner | Inhalt | Deploy |
+| --- | --- | --- |
+| `app/`, `components/`, `lib/`, `content/` | Website (Next.js) | Vercel, aus der Wurzel |
+| `bot/` | Discord-Bot (OpenCode-Bridge, Node.js) | eigener Prozess/Service |
+
+Der Bot ist ein Unterprojekt mit **eigener `package.json`** und eigenen
+Abhängigkeiten (`discord.js`, `@opencode/client`). Er hat eigene Tests
+(`bot/test/`) und wird getrennt gestartet:
+
+```bash
+npm run bot:doctor   # Verbindung zu OpenCode und Discord prüfen
+npm run bot:start    # Bot starten
+npm run bot:dev      # Neustart bei Änderungen
+npm run test:bot     # Bot-Tests
+```
+
+Die Bot-Konfiguration liegt in `bot/.env` (Vorlage: `bot/.env.example`). Die
+Token in der Wurzel-`.env` gelten nur für die Sync-Skripte in `scripts/`.
+
+Wichtig: Der Bot arbeitet standardmäßig mit `bot/` als Arbeitsverzeichnis
+für OpenCode. Um die Website zu bearbeiten, `OPENCODE_DIRECTORY=..` setzen
+oder bei `/ask` `directory:..` angeben.
 
 ### Vercel
 

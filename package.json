@@ -11,8 +11,12 @@
     "start": "next start",
     "lint": "eslint",
     "test": "node --test test/*.test.mjs",
+    "test:bot": "npm test --prefix bot",
     "sync:discord": "node --env-file=.env scripts/sync-laws-from-discord.mjs",
-    "publish:discord": "node --env-file=.env scripts/publish-laws.mjs"
+    "publish:discord": "node --env-file=.env scripts/publish-laws.mjs",
+    "bot:start": "npm start --prefix bot",
+    "bot:dev": "npm run dev --prefix bot",
+    "bot:doctor": "npm run doctor --prefix bot"
   },
   "dependencies": {
     "next": "16.4.2",

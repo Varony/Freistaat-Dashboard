@@ -1,13 +1,21 @@
 # Freistaat
 
-Website für eine Demokratie-Simulation im Discord: Wahlen, Bürgerbegehren,
-Gesetze und Parteien an einem Ort.
+Website und Discord-Bot für eine Demokratie-Simulation im Discord: Wahlen,
+Bürgerbegehren, Gesetze und Parteien an einem Ort.
 
-Aktueller Stand: **klickbarer Prototyp mit Beispieldaten**. Das Gesetzblatt
-wird bereits automatisch aus Discord synchronisiert. Anmeldung und echte
-Stimmabgabe fehlen noch; die übrigen Daten liegen in `lib/mock-data.ts`.
+Das Repository enthält zwei Teile:
+
+- **Website** (Wurzel, Next.js) – Wahlen, Bürgerbegehren, Gesetzblatt, Parteien.
+- **Discord-Bot** (`bot/`) – verbindet Discord mit OpenCode und wird für die
+  Arbeit an diesem Projekt aus Discord heraus genutzt.
+
+Aktueller Stand der Website: **klickbarer Prototyp mit Beispieldaten**. Das
+Gesetzblatt wird bereits automatisch aus Discord synchronisiert. Anmeldung und
+echte Stimmabgabe fehlen noch; die übrigen Daten liegen in `lib/mock-data.ts`.
 
 ## Entwicklung
+
+Website:
 
 ```bash
 npm install
@@ -17,10 +25,22 @@ npm run dev
 Öffne http://localhost:3000.
 
 ```bash
-npm run build   # Produktionsbuild
-npm run lint    # ESLint
-npm test        # Tests für den Discord-Sync
+npm run build       # Produktionsbuild
+npm run lint        # ESLint
+npm test            # Tests für den Discord-Sync
 ```
+
+Bot (eigene Abhängigkeiten in `bot/`):
+
+```bash
+npm install --prefix bot
+cp bot/.env.example bot/.env   # Token eintragen
+npm run bot:doctor             # Verbindung zu OpenCode und Discord prüfen
+npm run bot:start              # Bot starten
+npm run test:bot               # Bot-Tests
+```
+
+Details: [Discord-Bot](#discord-bot) unten.
 
 ## Discord-Sync
 
@@ -113,7 +133,25 @@ scripts/
 test/
   law-documents.test.mjs
   sync-laws.test.mjs
+bot/                 Discord-Bot mit OpenCode-Anbindung
+  package.json       eigene Abhängigkeiten (discord.js, @opencode/client)
+  .env.example       Vorlage für bot/.env
+  src/
+    index.js         Einstiegspunkt: Discord-Client, Login, Command-Registrierung
+    bot.js           Commands, Warteschlange, Event-Routing, Berechtigungen
+    view.js          Live-Streaming und finale Ausgabe einer Aufgabe
+    opencode.js      Verbindung, Sessions, Modelle, Agenten, Event-Stream
+    store.js         Persistente Channel→Session-Zuordnung
+    format.js        Chunking, Discord-Markdown, Formatierung
+    config.js        Umgebungsvariablen
+    doctor.js        Diagnose
+  test/
+    format.test.js
 ```
+
+`next-env.d.ts` und `.next/` werden beim Build erzeugt und sind nicht
+eingecheckt. `AGENTS.md` beschreibt die Entwicklung mit Test- und
+Produktionsserver.
 
 ## Design anpassen
 
@@ -129,8 +167,127 @@ hängen daran. Für einen Wechsel des Grundstils reicht es, diese Variablen zu
 ändern. Ein helles Theme kann später über einen zweiten Tokensatz ergänzt
 werden.
 
+## Discord-Bot
+
+Der Bot in `bot/` leitet Discord-Nachrichten an eine lokale
+[OpenCode](https://opencode.ai)-Instanz weiter. Du kannst aus einem Channel
+oder Thread heraus programmieren, Dateien ändern, Befehle ausführen und Fragen
+zum Projekt stellen.
+
+### Voraussetzungen
+
+- Node.js **20.9 oder neuer**
+- OpenCode **V2** installiert und eingerichtet (`opencode --version`)
+- Ein Discord-Bot-Account im
+  [Developer Portal](https://discord.com/developers/applications)
+
+Im Developer Portal aktivieren: **Message Content Intent** (für
+@Erwähnungen). Eingeladen wird mit den Scopes `bot`, `applications.commands`
+und mindestens den Rechten **Send Messages**, **Read Message History** und
+**Embed Links**.
+
+### Funktionen
+
+- Slash-Commands für OpenCode-Aufgaben, Sessions, Modelle und Agenten
+- @Erwähnung funktioniert ebenfalls (auch in DMs)
+- Live-Streaming der Antwort inklusive Werkzeug-Aufrufen, mit Stopp-Button
+- Berechtigungs-Anfragen von OpenCode als Discord-Nachricht mit Buttons
+  (einmal / immer / ablehnen)
+- Eine Session pro Channel oder Thread, automatisch gespeichert und nach
+  einem Neustart weiterverwendet
+- Warteschlange pro Channel, damit parallele Aufgaben nacheinander laufen
+
+### Commands
+
+| Command | Beschreibung |
+| --- | --- |
+| `/ask prompt:<text>` | Schickt eine Aufgabe an OpenCode. Optional `directory`, `agent`, `model`. |
+| `/new [title] [directory]` | Startet eine frische Session. |
+| `/stop` | Bricht die laufende Aufgabe ab und leert die Warteschlange. |
+| `/status` | Zeigt Session-ID, Verzeichnis, Agent, Modell, Tokens und Kosten. |
+| `/model [model]` | Zeigt das aktuelle Modell oder wechselt es (`provider/model`). |
+| `/agent [agent]` | Zeigt verfügbare Agenten oder wechselt den Agenten. |
+| `/compact` | Verdichtet den Gesprächskontext. |
+| `/sessions` | Listet die letzten Sessions im aktuellen Verzeichnis. |
+
+### Verzeichnisse und Sessions
+
+Jeder Channel und jeder Thread hat eine eigene OpenCode-Session. Das
+Standardverzeichnis ist `bot/`. Um die Website zu bearbeiten, in `bot/.env`
+`OPENCODE_DIRECTORY=..` setzen oder bei `/ask` `directory:..` angeben.
+
+### Konfiguration
+
+Alle Werte stehen in `bot/.env` (siehe `bot/.env.example`).
+
+| Variable | Standard | Bedeutung |
+| --- | --- | --- |
+| `DISCORD_TOKEN` | – | **Pflicht.** Bot-Token. |
+| `DISCORD_GUILD_ID` | – | Guild für sofortige Command-Registrierung. |
+| `DISCORD_ALLOWED_USERS` | alle | Kommagetrennte User-IDs, die den Bot nutzen dürfen. |
+| `DISCORD_ALLOWED_CHANNELS` | alle | Kommagetrennte Channel-IDs, in denen der Bot reagiert. |
+| `OPENCODE_URL` | lokaler Dienst | Entfernter OpenCode-Server, z. B. `http://127.0.0.1:4096`. |
+| `OPENCODE_AUTH` | – | `user:passwort` für Basic Auth am entfernten Server. |
+| `OPENCODE_TOKEN` | – | Bearer-Token für den entfernten Server. |
+| `OPENCODE_DIRECTORY` | `bot/` | Standard-Arbeitsverzeichnis. |
+| `OPENCODE_AGENT` | OpenCode-Standard | Standard-Agent, z. B. `build` oder `plan`. |
+| `OPENCODE_MODEL` | OpenCode-Standard | Standardmodell als `provider/model`. |
+| `OPENCODE_TIMEOUT_MS` | `1800000` | Maximale Laufzeit einer Aufgabe (30 min). |
+| `STREAM_UPDATE_MS` | `1500` | Abstand der Live-Updates. Bei Rate-Limits erhöhen. |
+| `STREAM_OUTPUT` | `true` | `false` deaktiviert die Live-Vorschau. |
+| `STATE_FILE` | `.data/state.json` | Speicherort der Channel→Session-Zuordnung. |
+
+### Sicherheit
+
+> **Wichtig:** Der Bot gibt jedem, der ihn benutzen darf, indirekt Shell- und
+> Dateizugriff auf das Arbeitsverzeichnis. Behandle ihn wie einen
+> Remote-Zugang zu deinem Rechner.
+
+- Setze mindestens `DISCORD_ALLOWED_USERS` **oder** `DISCORD_ALLOWED_CHANNELS`,
+  wenn der Bot auf einem Server mit anderen Mitgliedern läuft.
+- Der Discord-Token steht nur in `bot/.env` und wird nicht an OpenCode
+  weitergegeben.
+
+### Fehlerbehebung
+
+- **„OpenCode-Dienst nicht erreichbar“** – `opencode service status`, ggf.
+  `opencode service restart`, oder `OPENCODE_URL` setzen.
+- **Slash-Commands erscheinen nicht** – ohne `DISCORD_GUILD_ID` dauert die
+  globale Registrierung bis zu einer Stunde; mit
+  `applications.commands`-Scope einladen und Bot neu starten.
+- **Bot reagiert nicht auf @Erwähnungen** – Message Content Intent aktivieren.
+- **„Unknown interaction“** – bei sehr langsamen Modellen
+  `OPENCODE_TIMEOUT_MS` erhöhen, bei Rate-Limits `STREAM_UPDATE_MS`.
+
+### Als systemd-User-Dienst
+
+```ini
+# ~/.config/systemd/user/freistaat-bot.service
+[Unit]
+Description=Freistaat Discord Bot
+
+[Service]
+WorkingDirectory=%h/Documents/GitHub/Freistaat-Dashboard/bot
+ExecStart=/usr/bin/npm start
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=default.target
+```
+
+Passe `ExecStart` an deine Node-Installation an (bei mise z. B.
+`%h/.local/share/mise/shims/npm`).
+
+```bash
+systemctl --user daemon-reload
+systemctl --user enable --now freistaat-bot
+journalctl --user -u freistaat-bot -f
+```
+
 ## Nächste Schritte
 
 - Echte Stimmabgabe mit Discord-Login und Supabase
 - Ergebnisse und Fristen serverseitig auswerten
-- Optional: Bot postet Links zu offenen Abstimmungen und Ergebnisse
+- Bot um Befehle für Abstimmungen und Gesetzes-Überprüfung erweitern
+

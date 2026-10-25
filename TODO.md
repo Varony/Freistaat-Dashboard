@@ -8,6 +8,17 @@ Stand: 23.10.2026
 
 ## Erledigt
 
+### Zusammenführung mit dem Discord-Bot
+
+- [x] Separates Verzeichnis `Freistaat/` (OpenCode-Discord-Bot) in dieses
+      Repository übernommen, als Unterprojekt `bot/`
+- [x] Eigene `package.json`/`package-lock.json` im Bot; Root-Skripte
+      `bot:start`, `bot:dev`, `bot:doctor`, `test:bot`
+- [x] `bot/.env` (aus `bot/.env.example`), Root-`.env` bleibt nur für `scripts/`
+- [x] Bot-Engine auf `>=20.9.0` angeglichen (Abhängigkeiten verlangen nicht mehr)
+- [x] `.gitignore`, `README.md`, `AGENTS.md` auf die neue Struktur umgestellt
+- [x] Website-Build, Lint und beide Testsuiten nach dem Merge grün
+
 ### Website & Deployment
 
 - [x] Vercel-Projekt von „Other“ auf **Next.js** umgestellt
@@ -51,6 +62,14 @@ Stand: 23.10.2026
 - [ ] Test/Prod-Umschaltung vereinfachen: `law-documents.json` um
       `channels.test` / `channels.production` erweitern und einen
       Workflow-Input für die Umgebung ergänzen.
+
+## Offen – Discord-Bot (`bot/`)
+
+- [ ] Befehle für Gesetzes-Überprüfung im Bot ergänzen (im alten README
+      angekündigt, in `src/` aber noch nicht umgesetzt)
+- [ ] Bot als systemd-User-Dienst einrichten (`bot/README.md`)
+- [ ] Entscheiden, ob der Bot die Sync-Skripte aus `scripts/` aufrufen soll
+      statt eigener Logik
 
 ## Offen – Website vervollständigen
 
